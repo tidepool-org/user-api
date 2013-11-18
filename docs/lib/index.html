@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>index.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>index.js</h1>
+        
+
+        
+      </div>
+
+      
+        
+        <h2 id="index-js">index.js</h2>
+
+        
+      
+        
+        <p>This is the main file for the user API.</p>
+<p>So far, it only returns a key given a username/password</p>
+
+        
+          <div class='highlight'><pre>
+<span class="comment">/*
+ * == TIDEPOOL LICENSE ==
+ * Copyright (C) 2013 Tidepool Project
+ * 
+ * This source code is subject to the terms of the Tidepool Open Data License, v. 1.0.
+ * If a copy of the license was not provided with this file, you can obtain one at:
+ *     http://tidepool.org/license/
+ * 
+ * == TIDEPOOL LICENSE ==
+ */</span>
+
+
+(<span class="function"><span class="keyword">function</span><span class="params">()</span> {</span></pre></div>
+        
+      
+        
+        <p>We use strict because we’re only worried about modern browsers and we should be strict.
+JSHint actually insists on this and it’s a good idea.</p>
+
+        
+          <div class='highlight'><pre>  <span class="string">'use strict'</span>;</pre></div>
+        
+      
+        
+        <p>It’s also a good idea to predeclare all variables at the top of a scope. Javascript doesn’t
+support block scoping so putting them all at the beginning is a smart move.</p>
+
+        
+          <div class='highlight'><pre>  <span class="keyword">var</span> _, crypto, echo, envConfig, port, restify, server;</pre></div>
+        
+      
+        
+        <p>Server code needs the environment.</p>
+
+        
+          <div class='highlight'><pre>  envConfig = process.env;</pre></div>
+        
+      
+        
+        <p>Restify helps us with building a RESTful API.</p>
+
+        
+          <div class='highlight'><pre>  restify = require(<span class="string">'restify'</span>);
+  _ = require(<span class="string">'underscore'</span>);
+  crypto = require(<span class="string">'crypto-js'</span>);
+  server = restify.createServer({</pre></div>
+        
+      
+        
+        <p>The name is sent as one of the server headers</p>
+
+        
+          <div class='highlight'><pre>    name: <span class="string">'TidepoolUser'</span>
+  });</pre></div>
+        
+      
+        
+        <p>Two standard restify handler plugins:</p>
+
+        
+          <div class='highlight'><pre>  server.use(restify.queryParser());
+  server.use(restify.bodyParser());</pre></div>
+        
+      
+        
+        <p>This function merely echoes everything it got as a block of text. Useful for debugging.</p>
+
+        
+          <div class='highlight'><pre>  echo = <span class="function"><span class="keyword">function</span><span class="params">(req, res, next)</span> {</span>
+    console.log(<span class="string">'request'</span>, req.params, req.url, req.method);
+    res.send([
+      <span class="string">'Echo!'</span>, {
+        params: req.params,
+        headers: req.headers,
+        method: req.method
+      }
+    ]);
+    <span class="keyword">return</span> next();
+  };
+
+  <span class="keyword">var</span> status = <span class="function"><span class="keyword">function</span><span class="params">(req, res, next)</span> {</span>
+    console.log(<span class="string">'status'</span>, req.params, req.url, req.method);
+    res.send(<span class="string">'Ok'</span>);
+    <span class="keyword">return</span> next();
+  };</pre></div>
+        
+      
+        
+        <p>this is a stupid simple userid generation by creating a hash from the username
+and password given. If either one changes, it will be a different hash. </p>
+
+        
+          <div class='highlight'><pre>  <span class="keyword">var</span> login = <span class="function"><span class="keyword">function</span><span class="params">(req, res, next)</span> {</span>
+    console.log(<span class="string">'login'</span>, <span class="string">'(parameters masked)'</span>, req.url, req.method);
+    <span class="keyword">if</span> (!(req.params.username &amp;&amp; req.params.password))
+    {
+      res.send(<span class="number">400</span>, <span class="string">'Both username and password are required.'</span>);
+    }
+    <span class="keyword">else</span>
+    {
+      <span class="keyword">var</span> hash = crypto.algo.SHA1.create();
+      hash.update(req.params.username);
+      hash.update(req.params.password);
+      res.send({username: req.params.username, userid: hash.finalize().toString()});
+    }
+    <span class="keyword">return</span> next();
+  };</pre></div>
+        
+      
+        
+        <p>We need to have sensible responses for all the standard verbs, so we’ve got a system that makes
+it easy to reuse the same handlers for different verbs.</p>
+
+        
+          <div class='highlight'><pre>
+  <span class="keyword">var</span> v01api = [
+    { verbs: [<span class="string">'get'</span>, <span class="string">'post'</span>, <span class="string">'put'</span>, <span class="string">'del'</span>, <span class="string">'head'</span>], path: <span class="string">'/echo'</span>, func: echo },
+    { verb: <span class="string">'get'</span>, path: <span class="string">'/status'</span>, func: status },
+    { verbs: [<span class="string">'get'</span>, <span class="string">'post'</span>], path: <span class="string">'/login'</span>, func: login }
+  ];</pre></div>
+        
+      
+        
+        <p>helper function to set up one endpoint for one verb</p>
+
+        
+          <div class='highlight'><pre>  <span class="keyword">var</span> doVerb = <span class="function"><span class="keyword">function</span><span class="params">(verb, path, version, func)</span> {</span>
+    server[verb]({path: path, version: version }, func);
+  };</pre></div>
+        
+      
+        
+        <p>installs all the items defined in a version of the API</p>
+
+        
+          <div class='highlight'><pre>  <span class="keyword">var</span> installAPI = <span class="function"><span class="keyword">function</span><span class="params">(api, version)</span> {</span>
+    _.each(api, <span class="function"><span class="keyword">function</span><span class="params">(elt, idx, list)</span> {</span>
+      <span class="keyword">if</span> (elt.verbs) {
+        _.each(elt.verbs, <span class="function"><span class="keyword">function</span><span class="params">(verb)</span> {</span>
+          doVerb(verb, elt.path, version, elt.func);
+        });
+      }
+      <span class="keyword">else</span> <span class="keyword">if</span> (elt.verb) {
+        doVerb(elt.verb, elt.path, version, elt.func);
+      }
+    });
+  };
+
+  installAPI(v01api, <span class="string">'0.1.1'</span>);</pre></div>
+        
+      
+        
+        <p>If the port is specified in the environment we’ll use it, but for deploys we 
+want to run on port 80 and then map it in the router.</p>
+
+        
+          <div class='highlight'><pre>  port = envConfig.USER_PORT || <span class="number">80</span>;
+  console.log(<span class="string">'echo API server serving on port'</span>, port);
+  server.listen(port);</pre></div>
+        
+      
+        
+        <p>Wrap up the javascript namespacing model.</p>
+
+        
+          <div class='highlight'><pre>}).call(<span class="keyword">this</span>);</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>
