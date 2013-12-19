@@ -3,9 +3,9 @@
 var expect = require('chai').expect;
 var supertest = require('supertest');
 //var mongoHandler = require('./fakeMongoHandler');
-var userapi = require('../lib/index.js');
+var userapi = require('../lib/userapi.js');
 
-describe('user API', function() {
+describe('userapi basics', function() {
     it('should have user test', function(done) {
         var isTrue = true;
         expect(isTrue).to.exist;
@@ -13,11 +13,23 @@ describe('user API', function() {
     });
     it('should have an app', function(done) {
         expect(userapi).to.exist;
-        console.log(userapi);
         done();
     });
-    it('should have an app', function(done) {
-        expect(userapi).to.exist;
+    it('should have server object', function(done) {
+        expect(userapi.server).to.exist;
         done();
+    });
+    it.skip('should have installAPI method', function(done) {
+        expect(userapi).to.respondTo('installAPI');
+        done();
+    });
+});
+
+describe('user API', function() {
+
+    it('should respond to ', function(done) {
+        supertest(userapi.server)
+        .get('/status')
+        .expect(200, done);
     });
 });
