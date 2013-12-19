@@ -1,9 +1,9 @@
 'use strict';
-var should = require('should');
+var expect = require('chai').expect;
 describe('Tidepool user API', function(){
   it('should have user test', function(done) {
     var isTrue = true;
-    should.exist(isTrue);
+    expect(isTrue).to.exist;
     done();
   });
 });
