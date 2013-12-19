@@ -25,11 +25,46 @@ describe('userapi basics', function() {
     });
 });
 
-describe('user API', function() {
+describe('GET /status', function() {
 
-    it('should respond to ', function(done) {
+    it('should respond with 200 "Ok" ', function(done) {
         supertest(userapi.server)
         .get('/status')
-        .expect(200, done);
-    });
+        .expect(200)
+        .end(function(err, res) {
+            expect(err).to.not.exist;
+            expect(res.text).to.equal('"Ok"');
+            done();
+        });
+     });
+
+    it('should respond with 404 if you set status to 404', function(done) {
+        supertest(userapi.server)
+        .get('/status?status=404')
+        .expect(404);
+        done();
+     });
+
+    it('should ignore extra query parameters', function(done) {
+        supertest(userapi.server)
+        .get('/status?bogus=whatever')
+        .expect(200)
+        .end(function(err, res) {
+            expect(err).to.not.exist;
+            expect(res.text).to.equal('"Ok"');
+            done();
+        });
+     });
+
+});
+
+describe('GET /nonexistent', function() {
+
+    it('should respond with 404', function(done) {
+        supertest(userapi.server)
+        .get('/nonexistent')
+        .expect(404);
+        done();
+     });
+
 });
