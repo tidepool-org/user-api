@@ -6,53 +6,46 @@ var supertest = require('supertest');
 var userapi = require('../lib/userapi.js');
 
 describe('userapi basics', function() {
-    it('should have user test', function(done) {
+    it('should have user test', function() {
         var isTrue = true;
         expect(isTrue).to.exist;
-        done();
     });
-    it('should have an app', function(done) {
+    it('should have an app', function() {
         expect(userapi).to.exist;
-        done();
     });
-    it('should have server object', function(done) {
+    it('should have server object', function() {
         expect(userapi.server).to.exist;
-        done();
     });
-    it.skip('should have installAPI method', function(done) {
+    it.skip('should have installAPI method', function() {
         expect(userapi).to.respondTo('installAPI');
-        done();
     });
 });
 
 describe('GET /status', function() {
 
-    it('should respond with 200 "Ok" ', function(done) {
+    it('should respond with 200 "Ok" ', function() {
         supertest(userapi.server)
         .get('/status')
         .expect(200)
         .end(function(err, res) {
             expect(err).to.not.exist;
             expect(res.text).to.equal('"Ok"');
-            done();
         });
      });
 
-    it('should respond with 404 if you set status to 404', function(done) {
+    it('should respond with 404 if you set status to 404', function() {
         supertest(userapi.server)
         .get('/status?status=404')
         .expect(404);
-        done();
      });
 
-    it('should ignore extra query parameters', function(done) {
+    it('should ignore extra query parameters', function() {
         supertest(userapi.server)
         .get('/status?bogus=whatever')
         .expect(200)
         .end(function(err, res) {
             expect(err).to.not.exist;
             expect(res.text).to.equal('"Ok"');
-            done();
         });
      });
 
@@ -60,52 +53,50 @@ describe('GET /status', function() {
 
 describe('GET /nonexistent', function() {
 
-    it('should respond with 404', function(done) {
+    it('should respond with 404', function() {
         supertest(userapi.server)
         .get('/nonexistent')
         .expect(404);
-        done();
      });
 
 });
 
 describe('POST /status', function() {
 
-    it('should respond with 404', function(done) {
+    it('should respond with 404', function() {
         supertest(userapi.server)
         .post('/status')
         .expect(404);
-        done();
      });
 
 });
 
-describe('GET /user/auth with an invalid ID/token', function() {
+describe('POST /user/login with an invalid userid/pw', function() {
 
-    it('should respond with 401', function(done) {
+    it('should respond with 401', function() {
         supertest(userapi.server)
-        .get('/user/auth')
-        .set('X-Tidepool-Application-ID', 'badid')
-        .set('X-Tidepool-API-Token', 'abcdef1234567890')
-        .expect(401);
-        done();
-     });
-
-});
-
-describe('POST /user/auth with a valid ID/token', function() {
-
-    it('should respond with 200 and a session token', function(done) {
-        supertest(userapi.server)
-        .get('/user/auth')
-        .set('X-Tidepool-Application-ID', 'realid')
-        .set('X-Tidepool-API-Token', 'abcdef1234567890')
-        .expect(200)        
+        .post('/user/login')
+        .set('X-Tidepool-UserID', 'badid')
+        .set('X-Tidepool-Password', 'abcdef1234567890')
+        .expect(401)
         .end(function(err, res) {
             expect(err).to.not.exist;
-            expect('Content-Type', 'application/json');
-            expect('X-Tidepool-Session-Token', /[a-f0-9]{16}/);
-            done();
+        });
+     });
+
+});
+
+describe('POST /user/login with a valid userid/pw', function() {
+
+    it('should respond with 200 and a session token', function() {
+        supertest(userapi.server)
+        .post('/user/login')
+        .set('X-Tidepool-UserID', 'realid')
+        .set('X-Tidepool-Password', 'abcdef1234567890')
+        .expect(200)
+        .expect('X-Tidepool-Session-Token', /[a-zA-Z0-9.]+/)
+        .end(function(err, res) {
+            expect(err).to.not.exist;
         });
 
      });
@@ -114,40 +105,37 @@ describe('POST /user/auth with a valid ID/token', function() {
 
 describe('GET /login', function() {
 
-    it('should respond with 404', function(done) {
+    it('should respond with 404', function() {
         supertest(userapi.server)
         .get('/login')
         .expect(404);
-        done();
      });
 
 });
 
 describe('POST /user without any data', function() {
 
-    it('should respond with 400', function(done) {
+    it('should respond with 400', function() {
         supertest(userapi.server)
         .post('/status')
         .expect(400);
-        done();
      });
 
 });
 
 describe('GET /login', function() {
 
-    it('should respond with 404', function(done) {
+    it('should respond with 404', function() {
         supertest(userapi.server)
         .get('/login')
         .expect(404);
-        done();
      });
 
 });
 
 describe('POST /user for a new user minimal fields and no conflict', function() {
 
-    it.skip('should respond with 200', function(done) {
+    it.skip('should respond with 200', function() {
         supertest(userapi.server)
         .post('/status')
         .send({
@@ -159,7 +147,6 @@ describe('POST /user for a new user minimal fields and no conflict', function() 
         .end(function(err, res) {
             expect(err).to.not.exist;
             expect(res.text).to.equal('"Ok"');
-            done();
         });
      });
 
@@ -168,7 +155,7 @@ describe('POST /user for a new user minimal fields and no conflict', function() 
 
 describe('POST /login', function() {
 
-    it.skip('guest with no PW should respond with 200', function(done) {
+    it.skip('guest with no PW should respond with 200', function() {
         supertest(userapi.server)
         .post('/status')
         .send({ username: 'guest', password: '' })
@@ -176,7 +163,6 @@ describe('POST /login', function() {
         .end(function(err, res) {
             expect(err).to.not.exist;
             expect(res.text).to.equal('"Ok"');
-            done();
         });
      });
 
