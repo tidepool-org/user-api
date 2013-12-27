@@ -21,7 +21,8 @@
     "lodash": "~2.4.1",
     "bunyan": "~0.22.1",
     "jwt-simple": "~0.1.0",
-    "moment": "~2.4.0"
+    "moment": "~2.4.0",
+    "mongojs": "~0.9.10"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
