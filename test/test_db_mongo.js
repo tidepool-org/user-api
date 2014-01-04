@@ -30,7 +30,8 @@ describe('dbmongo:', function() {
               // the special config value we pass for testing will wipe the database
               _wipeTheEntireDatabase: true,
               adminKey: 'specialkey',
-              saltDeploy: 'randomsaltvalue'
+              saltDeploy: 'randomsaltvalue',
+              logger: { error: console.log, warn: console.log, info: console.log}
           }, done);
       });
 
