@@ -1,15 +1,19 @@
 'use strict';
 
 var expect = require('chai').expect;
-var dbmongo = require('../lib/db_mongo.js');
+var dbmongo = require('../lib/db_mongo.js')({
+        mongoConnectionString: 'mongodb://localhost/test',
+          // the special config value we pass for testing will enable us to wipe the database
+          _wipeTheEntireDatabase: true,
+          adminKey: 'specialkey',
+          saltDeploy: 'randomsaltvalue',
+          logger: { error: console.log, warn: console.log, info: console.log}
+        });
 
 describe('dbmongo:', function() {
   describe('db_mongo basics', function() {
     it('should have an app', function() {
       expect(dbmongo).to.exist;
-    });
-    it('should have init method', function() {
-      expect(dbmongo).to.respondTo('init');
     });
     it('should have addUser method', function() {
       expect(dbmongo).to.respondTo('addUser');
@@ -25,14 +29,7 @@ describe('dbmongo:', function() {
   describe('db_mongo', function() {
 
     before(function(done) {
-      dbmongo.init({
-        mongoConnectionString: 'mongodb://localhost/test',
-          // the special config value we pass for testing will wipe the database
-          _wipeTheEntireDatabase: true,
-          adminKey: 'specialkey',
-          saltDeploy: 'randomsaltvalue',
-          logger: { error: console.log, warn: console.log, info: console.log}
-        }, done);
+      dbmongo._wipeTheEntireDatabase(done);
     });
 
     var user1 = {username: 'Testy', emails: ['mctesty@mctester.com'], password: 'test2'};
