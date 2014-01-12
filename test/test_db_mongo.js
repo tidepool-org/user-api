@@ -1,3 +1,18 @@
+// == BSD2 LICENSE ==
+// Copyright (c) 2014, Tidepool Project
+// 
+// This program is free software; you can redistribute it and/or modify it under
+// the terms of the associated License, which is identical to the BSD 2-Clause
+// License as published by the Open Source Initiative at opensource.org.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the License for more details.
+// 
+// You should have received a copy of the License along with this program; if
+// not, you can obtain one from Tidepool Project at tidepool.org.
+// == BSD2 LICENSE ==
+
 'use strict';
 
 var expect = require('chai').expect;
@@ -15,6 +30,9 @@ describe('dbmongo:', function() {
     it('should have an app', function() {
       expect(dbmongo).to.exist;
     });
+    it('should have status method', function() {
+      expect(dbmongo).to.respondTo('status');
+    });
     it('should have addUser method', function() {
       expect(dbmongo).to.respondTo('addUser');
     });
@@ -29,6 +47,7 @@ describe('dbmongo:', function() {
   describe('db_mongo', function() {
 
     before(function(done) {
+      expect(dbmongo).to.respondTo('_wipeTheEntireDatabase');
       dbmongo._wipeTheEntireDatabase(done);
     });
 
@@ -51,14 +70,20 @@ describe('dbmongo:', function() {
     };
 
     var shouldSucceed = function(err, result, code) {
+      if (err) {
+        console.log(err);
+      }
       expect(err).to.not.exist;
       expect(result).to.exist;
       expect(result.statuscode).to.equal(code);
     };
 
     var shouldFail = function(err, result, code) {
-      expect(err).to.exist;
+      if (result) {
+        console.log(result);
+      }
       expect(result).to.not.exist;
+      expect(err).to.exist;
       expect(err.statuscode).to.equal(code);
       expect(err.msg).to.exist;
     };
