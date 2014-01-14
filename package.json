@@ -22,7 +22,8 @@
     "bunyan": "~0.22.1",
     "jwt-simple": "~0.1.0",
     "moment": "~2.4.0",
-    "mongojs": "~0.9.10"
+    "mongojs": "~0.9.10",
+    "oauth2orize": "~1.0.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

@@ -25,6 +25,27 @@ var dbmongo = require('../lib/db_mongo.js')({
           logger: { error: console.log, warn: console.log, info: console.log}
         });
 
+var shouldSucceed = function(err, result, code) {
+  if (err) {
+    console.log(err);
+  }
+  expect(err).to.not.exist;
+  expect(result).to.exist;
+  expect(result.statuscode).to.equal(code);
+};
+
+var shouldFail = function(err, result, code) {
+  if (result) {
+    console.log(result);
+  }
+  expect(result).to.not.exist;
+  expect(err).to.exist;
+  expect(err.statuscode).to.equal(code);
+  expect(err.msg).to.exist;
+};
+
+
+
 describe('dbmongo:', function() {
   describe('db_mongo basics', function() {
     it('should have an app', function() {
@@ -67,25 +88,6 @@ describe('dbmongo:', function() {
       expect(user.emails.length).to.equal(1);
       expect(user.emails[0]).to.equal(ref.emails[0]);
       expect(user.userid.length).to.equal(10);
-    };
-
-    var shouldSucceed = function(err, result, code) {
-      if (err) {
-        console.log(err);
-      }
-      expect(err).to.not.exist;
-      expect(result).to.exist;
-      expect(result.statuscode).to.equal(code);
-    };
-
-    var shouldFail = function(err, result, code) {
-      if (result) {
-        console.log(result);
-      }
-      expect(result).to.not.exist;
-      expect(err).to.exist;
-      expect(err.statuscode).to.equal(code);
-      expect(err.msg).to.exist;
     };
 
     it('should have a good status return', function(done) {
@@ -138,6 +140,22 @@ describe('dbmongo:', function() {
         shouldSucceed(err, result, 200);
         expect(result.detail.length).to.equal(1);
         checkResult(result.detail[0], user2);
+        done();
+      });
+    });
+
+    it('should find a user by email with a correct password', function(done) {
+      dbmongo.getUser({user: user2.emails[0], password: user2.password}, function(err, result) {
+        shouldSucceed(err, result, 200);
+        expect(result.detail.length).to.equal(1);
+        checkResult(result.detail[0], user2);
+        done();
+      });
+    });
+
+    it('should fail to find a user by email with an incorrect password', function(done) {
+      dbmongo.getUser({user: user2.emails[0], password: user2.password + 'z'}, function(err, result) {
+        shouldSucceed(err, result, 204);
         done();
       });
     });
@@ -207,5 +225,51 @@ describe('dbmongo:', function() {
       });
     });
 
+  });
+
+  describe('testing token store', function() {
+
+    it('should store a token', function(done) {
+      dbmongo.storeToken({token: 'whatever'}, function(err, result) {
+        shouldSucceed(err, result, 201);
+        done();
+      });
+    });
+
+    it('should find a token', function(done) {
+      dbmongo.findToken({token: 'whatever'}, function(err, result) {
+        shouldSucceed(err, result, 200);
+        done();
+      });
+    });
+      
+    it('should fail to find a nonexistent token', function(done) {
+      dbmongo.findToken({token: 'missing'}, function(err, result) {
+        shouldSucceed(err, result, 404);
+        done();
+      });
+    });
+
+    it('should delete a token', function(done) {
+      dbmongo.deleteToken({token: 'whatever'}, function(err, result) {
+        shouldSucceed(err, result, 200);
+        done();
+      });
+    });
+      
+    it('should fail to delete a deleted token', function(done) {
+      dbmongo.deleteToken({token: 'whatever'}, function(err, result) {
+        shouldSucceed(err, result, 404);
+        done();
+      });
+    });
+
+    it('should fail to delete a nonexistent token', function(done) {
+      dbmongo.deleteToken({token: 'missing'}, function(err, result) {
+        shouldSucceed(err, result, 404);
+        done();
+      });
+    });
+      
   });
 });
