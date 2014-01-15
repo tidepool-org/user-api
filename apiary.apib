@@ -10,17 +10,29 @@ User related resources of the **User API**
 
 ## Login [/login]
 ### Log in an existing user [POST]
-+ Request (application/json)
++ Request
 
-        {
-        }
+    + Headers
+    
+            X-Tidepool-UserID: {username}
+            X-Tidepool-Password: {password}
+            
 
 + Response 200 (application/json)
 
-        {
-            "userid": "123123abcd"
-        }
+    + Headers
 
+            x-tidepool-session-token : 1324234234.adfa234.123ad34
+
+    + Body
+    
+            {
+              "userid": "123123abcd",
+              "username": {username},
+              "emails" : [ "email1@foo.com" ]
+            }
+
+    
 ## User records [/user]
 ### Retrieve current user's info [GET]
 + Response 200 (application/json)
