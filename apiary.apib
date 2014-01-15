@@ -1,14 +1,28 @@
 FORMAT: 1A
-HOST: http://www.google.com
+HOST: http://tidepool.io
 
 # tidepool-user-api
-Notes API is a *short texts saving* service similar to its physical paper presence on your table.
+The Tidepool User API is used to manage the user login information and pretty much nothing else.
+Temporarily, it also manages sessions. That will change.
 
-# Group Notes
-Notes related resources of the **Notes API**
+# Group User
+User related resources of the **User API**
 
-## Notes Collection [/notes]
-### List all Notes [GET]
+## Login [/login]
+### Log in an existing user [POST]
++ Request (application/json)
+
+        {
+        }
+
++ Response 200 (application/json)
+
+        {
+            "userid": "123123abcd"
+        }
+
+## User records [/user]
+### Retrieve current user's info [GET]
 + Response 200 (application/json)
 
         [{
