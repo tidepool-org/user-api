@@ -43,7 +43,7 @@ describe('userapi basics', function() {
 
 describe('GET /status', function() {
 
-    it('should respond with 200 "Ok" ', function(done) {
+    it('should respond with 200', function(done) {
         supertest(userapi.server)
         .get('/status')
         .expect(200)
