@@ -14,11 +14,30 @@ Returns a status health check with a list of status of its dependencies
 
 + Response 200
 
+        If the server is operating properly and all dependencies are up and running.
+
         {
             "up" : [ "mongo" ],
             "down" : []
         }
     
++ Response 500
+
+        If the server is *not* operating properly and one or more dependencies
+        have failed to start or are no longer running.
+
+        {
+            "up" : [],
+            "down" : [ "mongo" ]
+        }
+
+## Testing Status [/status/{statusvalue}]
+### Retrieve status information [GET]
+Returns whatever status it was sent as a parameter
++ Parameters
+    + statusvalue (required, integer, `404`) ... The return code you want from the status call
+
++ Response 404    
 
 ## Login [/login]
 ### Log in an existing user [POST]
