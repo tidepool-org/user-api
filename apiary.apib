@@ -62,6 +62,10 @@ Returns whatever status it was sent as a parameter
               "username": "user@tidepool.org,
               "emails" : [ "email1@foo.com" ]
             }
+            
++ Response 401
+
+        When the username/password combination fails.
 
 ### Refresh a session token [GET]
 
@@ -89,6 +93,14 @@ be a bad idea.
               "userid": "123123abcd",
             }
 
++ Response 401
+
+        When the token is invalid.
+
++ Response 404
+
+        When the token is not provided.
+
 
 ## Logout [/logout]
 ### Log out from an existing session [POST]
@@ -100,6 +112,10 @@ be a bad idea.
             x-tidepool-session-token : 23sadf87.123840.aasd90JKj
 
 + Response 200
+
++ Response 401
+
+        When the token is invalid or not provided or has expired.
 
 
     
@@ -119,6 +135,10 @@ be a bad idea.
               "username": "user@tidepool.org,
               "emails" : [ "email1@foo.com" ]
             }
+
++ Response 401
+
+        When the token is invalid or not provided.
 
 
 ### Create a user [POST]
@@ -148,6 +168,16 @@ be a bad idea.
               "emails" : [ "email1@foo.com" ]
             }
 
++ Response 400
+
+        When the body information is invalid (usually because something
+        is not unique)
+
++ Response 401
+
+        When the token is invalid or not provided.
+
+
 
 ## User info for another user [/user/{userid}]
 ### Retrieve other user's info [GET]
@@ -168,6 +198,14 @@ be a bad idea.
               "username": "otheruser@tidepool.org",
               "emails" : [ "email2@foo.com" ]
             }
+
++ Response 401
+
+        When the token is invalid or not provided.
+
++ Response 404
+
+        When the userid was not found.
 
 
 
