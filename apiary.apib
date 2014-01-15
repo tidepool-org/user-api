@@ -8,17 +8,57 @@ Temporarily, it also manages sessions. That will change.
 # Group User
 User related resources of the **User API**
 
+## Status [/status]
+### Retrieve status information [GET]
+Returns a status health check with a list of status of its dependencies
+
++ Response 200
+
+        {
+            "up" : [ "mongo" ],
+            "down" : []
+        }
+    
+
 ## Login [/login]
 ### Log in an existing user [POST]
 + Request
 
     + Headers
     
-            X-Tidepool-UserID: {username}
-            X-Tidepool-Password: {password}
+            X-Tidepool-UserID: blipuser
+            X-Tidepool-Password: my_1337_password
             
 
 + Response 200 (application/json)
+
+    + Headers
+
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
+    + Body
+    
+            {
+              "userid": "ebe58036a5",
+              "username": "user@tidepool.org,
+              "emails" : [ "email1@foo.com" ]
+            }
+
+### Refresh a session token [GET]
+
+This call takes a token, and if the token was still valid, issues
+a new (different) token; it also returns the userid in the body. This may
+be a bad idea.
+
++ Request
+
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+            
+
++ Response 200 (application/json)
+
 
     + Headers
 
@@ -28,46 +68,87 @@ User related resources of the **User API**
     
             {
               "userid": "123123abcd",
-              "username": {username},
-              "emails" : [ "email1@foo.com" ]
             }
+
+
+## Logout [/logout]
+### Log out from an existing session [POST]
+
++ Request
+
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
++ Response 200
+
 
     
 ## User records [/user]
 ### Retrieve current user's info [GET]
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
 + Response 200 (application/json)
-
-        [{
-          "id": 1, "title": "Jogging in park"
-        }, {
-          "id": 2, "title": "Pick-up posters from post-office"
-        }]
-
-### Create a Note [POST]
-+ Request (application/json)
-
-        { "title": "Buy cheese and bread for breakfast." }
-
-+ Response 201 (application/json)
-
-        { "id": 3, "title": "Buy cheese and bread for breakfast." }
-
-## Note [/notes/{id}]
-A single Note object with all its details
-
-+ Parameters
-    + id (required, number, `1`) ... Numeric `id` of the Note to perform action with. Has example value.
-
-### Retrieve a Note [GET]
-+ Response 200 (application/json)
-
-    + Header
-
-            X-My-Header: The Value
 
     + Body
+    
+            {
+              "userid": "ebe58036a5",
+              "username": "user@tidepool.org,
+              "emails" : [ "email1@foo.com" ]
+            }
 
-            { "id": 2, "title": "Pick-up posters from post-office" }
 
-### Remove a Note [DELETE]
-+ Response 204
+### Create a user [POST]
++ Request (application/json)
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
+    + Body
+    
+            {
+              "username": "user@tidepool.org",
+              "emails" : [ "email1@foo.com" ],
+              "password" : "secret"
+            }
+
++ Response 201 (application/json)
+    + Headers
+
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
+    + Body
+    
+            {
+              "userid": "ebe58036a5",
+              "username": "user@tidepool.org",
+              "emails" : [ "email1@foo.com" ]
+            }
+
+
+## User info for another user [/user/{userid}]
+### Retrieve other user's info [GET]
++ Parameters
+    + userid (required, string, `123123abcd`) ... Tidepool-assigned user ID
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
++ Response 200 (application/json)
+
+    + Body
+    
+            {
+              "userid": userid,
+              "username": "otheruser@tidepool.org",
+              "emails" : [ "email2@foo.com" ]
+            }
+
+
+
