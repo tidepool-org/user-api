@@ -1,3 +1,6 @@
+// Loads the environment and makes it accessible,
+// and also has sensible defaults
+
 // == BSD2 LICENSE ==
 // Copyright (c) 2014, Tidepool Project
 // 
@@ -14,11 +17,14 @@
 // == BSD2 LICENSE ==
 
 'use strict';
-var expect = require('chai').expect;
-describe('Tidepool user API', function(){
-  it('should have user test', function(done) {
-    var isTrue = true;
-    expect(isTrue).to.exist;
-    done();
-  });
-});
+module.exports = (function() {
+    var env = {};
+
+    // The port for the server to listen on.
+    env.port = process.env.PORT || 7053;
+    env.mongoConnectionString = process.env.MONGO_CONNECTION_STRING || 'mongodb://localhost/user';
+    env.userAdminKey = process.env.ADMIN_KEY || ''; // if the admin key isn't specified, disable admin mode.
+    env.logName = process.env.LOG_NAME || 'userapi';
+    env.saltDeploy = process.env.SALT_DEPLOY; // you MUST specify a salt -- if you don't, it could corrupt your database
+    return env;
+})();
