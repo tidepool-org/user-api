@@ -12,4 +12,4 @@ run mongo
 
 API documentation can be found on apiary.
 
-The apiary page is [here](https://app.apiary.io/tidepooluserapi).
+The apiary page is [here](http://docs.tidepooluserapi.apiary.io/).
