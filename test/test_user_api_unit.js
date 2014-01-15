@@ -147,8 +147,9 @@ describe('Create and manage a user', function() {
     };
 
     var sessionToken = null;
+    var oldToken = null;
 
-    describe('POST /user with a complete payload to create a new user', function() {
+    describe('POST /user with a complete payload to create a new user and log in', function() {
 
         it('should respond with 201', function(done) {
             supertest(userapi.server)
@@ -162,10 +163,28 @@ describe('Create and manage a user', function() {
                 expect(obj.res.body.userid).to.exist;
                 expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
                 user.userid = obj.res.body.userid;
+                expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+                sessionToken = obj.res.headers['x-tidepool-session-token'];
                 done();
             });
         });
     });
+
+    describe('POST /logout with valid session token #1', function() {
+
+        it('should respond with 200 and log out', function(done) {
+            supertest(userapi.server)
+            .post('/logout')
+            .set('X-Tidepool-Session-Token', sessionToken)
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                done();
+            });
+        });
+
+    });
+
 
     describe('POST /login for that user with a slightly bad password', function() {
         it('should respond with 401', function(done) {
@@ -210,8 +229,8 @@ describe('Create and manage a user', function() {
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200)
             .end(function(err, obj) {
-                console.log('c');
                 if (err) return done(err);
+                console.log(obj.res.body);
                 expect(obj.res.body.username).to.exist;
                 expect(obj.res.body.username).to.equal(user.username);
                 expect(obj.res.body.emails).to.exist;
@@ -223,7 +242,44 @@ describe('Create and manage a user', function() {
         });
     });
 
-    describe('GET /logout without a sessionToken', function() {
+    describe('GET /login for logged in user', function() {
+
+        it('should return 200 with a new token and the user ID', function(done) {
+            supertest(userapi.server)
+            .get('/login')
+            .set('X-Tidepool-Session-Token', sessionToken)
+            .expect(200)
+            .end(function(err, obj) {
+                if (err) return done(err);
+                console.log(obj.res.status);
+                console.log(obj.res.body);
+                expect(obj.res.body.userid).to.equal(user.userid);
+                expect(obj.res.headers['x-tidepool-session-token']).to.exist;
+                expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(sessionToken);
+                oldToken = sessionToken;
+                sessionToken = obj.res.headers['x-tidepool-session-token'];
+                done();
+            });
+         });
+
+    });
+
+    describe('GET /login with old token', function() {
+
+        it('should return 401', function(done) {
+            supertest(userapi.server)
+            .get('/login')
+            .set('X-Tidepool-Session-Token', oldToken)
+            .expect(401)
+            .end(function(err, obj) {
+                if (err) return done(err);
+                done();
+            });
+         });
+    });
+
+
+    describe('POST /logout without a sessionToken', function() {
 
         it('should respond with 401', function(done) {
             supertest(userapi.server)
@@ -237,7 +293,7 @@ describe('Create and manage a user', function() {
 
     });
 
-    describe('GET /logout', function() {
+    describe('POST /logout with valid session token #2', function() {
 
         it('should respond with 200', function(done) {
             supertest(userapi.server)
