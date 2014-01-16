@@ -211,14 +211,14 @@ describe('dbmongo:', function() {
       });
     });
 
-    it('should fail to delete a user with an invalid administrative key', function(done) {
+    it('should fail to delete a user given an invalid administrative key', function(done) {
       dbmongo.deleteUser({userid: user2.userid, adminKey: 'zzz'}, function(err, result) {
         shouldFail(err, result, 401);
         done();
       });
     });
 
-    it('should delete a user with a valid administrative key', function(done) {
+    it('should delete a user given a valid administrative key', function(done) {
       dbmongo.deleteUser({userid: user2.userid, adminKey: 'specialkey'}, function(err, result) {
         shouldSucceed(err, result, 200);
         done();
