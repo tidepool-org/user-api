@@ -1,4 +1,4 @@
 #! /bin/bash -eu
 
 . config/env.sh
-node lib/index.js
+exec node lib/index.js

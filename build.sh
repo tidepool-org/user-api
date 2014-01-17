@@ -18,7 +18,7 @@ mkdir -p ${DBPATH}
 mongod --noprealloc --nojournal --smallfiles --dbpath ${DBPATH} --logpath ${BUILD_DIR}/mongo_log.log &
 MONGO_PID=$!
 echo "Sleeping to let mongo start up"
-sleep 3000
+sleep 3
 echo "Running tests"
 trap "cleanup ${MONGO_PID}" EXIT
 
