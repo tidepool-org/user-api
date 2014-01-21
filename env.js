@@ -24,6 +24,7 @@ module.exports = (function() {
     env.port = process.env.PORT || 7053;
     env.mongoConnectionString = process.env.MONGO_CONNECTION_STRING || 'mongodb://localhost/user';
     env.userAdminKey = process.env.ADMIN_KEY || ''; // if the admin key isn't specified, disable admin mode.
+    env.serverSecret = process.env.SHARED_SERVER_SECRET || ''; // shared secret so machines can log in
     env.logName = process.env.LOG_NAME || 'userapi';
     env.saltDeploy = process.env.SALT_DEPLOY; // you MUST specify a salt -- if you don't, it could corrupt your database
     return env;
