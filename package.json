@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "test": "make test"
+    "test": "grunt jshint test"
   },
   "repository": "https://github.com/tidepool-org/dummy-api.git",
   "author": "Tidepool",
