@@ -347,7 +347,7 @@ describe('userapi', function(){
           .expect(401)
           .end(function(err, obj) {
                  if (err) return done(err);
-                 expect(obj.res.body).to.not.exist;
+                 expect(obj.res.body).to.equal('Unauthorized');
                  done();
                });
       });
@@ -400,6 +400,7 @@ describe('Create and manage a user as a machine', function() {
                 if (err) return done(err);
                 expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
                 serverToken = obj.res.headers['x-tidepool-session-token'];
+                expect(serverToken).to.not.equal(sessionToken);
                 done();
             });
         });
@@ -434,7 +435,7 @@ describe('Create and manage a user as a machine', function() {
             .expect(401)
             .end(function(err, obj) {
                  if (err) return done(err);
-                 expect(obj.res.body).to.not.exist;
+                 expect(obj.res.body).to.equal('Unauthorized');
                  done();
                });
         });
@@ -449,10 +450,7 @@ describe('Create and manage a user as a machine', function() {
             .end(function(err, obj) {
                 if (err) return done(err);
                 // console.log(obj.res.body);
-                expect(obj.res.body.username).to.exist;
-                expect(obj.res.body.username).to.equal(user.username);
-                expect(obj.res.body.emails).to.exist;
-                expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+                expect(obj.res.body.userid).to.exist;
                 expect(obj.res.body.userid).to.exist;
                 expect(obj.res.body.userid).to.equal(user.userid);
                 done();
@@ -474,7 +472,7 @@ describe('Create and manage a user as a machine', function() {
                 expect(obj.res.body.userid).to.equal('Test Server');
                 expect(obj.res.headers['x-tidepool-session-token']).to.exist;
                 expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(serverToken);
-                sessionToken = obj.res.headers['x-tidepool-session-token'];
+                serverToken = obj.res.headers['x-tidepool-session-token'];
                 done();
             });
          });
