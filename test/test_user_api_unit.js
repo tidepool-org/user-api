@@ -67,7 +67,6 @@ describe('userapi', function(){
         .end(function(err, obj) {
                if (err) return done(err);
                expect(err).to.not.exist;
-               // console.log(obj);
                expect(obj.res.body.down).to.eql([]);
                expect(obj.res.body.up).to.eql(['mongo']);
                done();
@@ -212,10 +211,6 @@ describe('userapi', function(){
           .expect(401)
           .end(function(err, obj) {
                  if (err) return done(err);
-                 // console.log('a');
-                 // console.log('BODY: ', obj.res.body);
-                 // expect(obj.headers['x-tidepool-session-token']).to.not.exist;
-                 // expect(obj.res.body).to.equal('login failed');
                  done();
                });
       });
@@ -247,7 +242,6 @@ describe('userapi', function(){
           .expect(200)
           .end(function(err, obj) {
                  if (err) return done(err);
-                 // console.log(obj.res.body);
                  expect(obj.res.body.username).to.exist;
                  expect(obj.res.body.username).to.equal(user.username);
                  expect(obj.res.body.emails).to.exist;
@@ -268,8 +262,6 @@ describe('userapi', function(){
           .expect(200)
           .end(function(err, obj) {
                  if (err) return done(err);
-                 // console.log(obj.res.status);
-                 // console.log(obj.res.body);
                  expect(obj.res.body.userid).to.equal(user.userid);
                  expect(obj.res.headers['x-tidepool-session-token']).to.exist;
                  expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(sessionToken);
@@ -415,7 +407,6 @@ describe('Create and manage a user as a machine', function() {
             .expect(200)
             .end(function(err, obj) {
                 if (err) return done(err);
-                // console.log(obj.res.body);
                 expect(obj.res.body.username).to.exist;
                 expect(obj.res.body.username).to.equal(user.username);
                 expect(obj.res.body.emails).to.exist;
@@ -467,8 +458,6 @@ describe('Create and manage a user as a machine', function() {
             .expect(200)
             .end(function(err, obj) {
                 if (err) return done(err);
-                // console.log(obj.res.status);
-                // console.log(obj.res.body);
                 expect(obj.res.body.userid).to.equal('Test Server');
                 expect(obj.res.headers['x-tidepool-session-token']).to.exist;
                 expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(serverToken);
