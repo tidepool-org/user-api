@@ -1,7 +1,7 @@
 {
-  "name": "dummy-api",
-  "version": "0.0.1",
-  "description": "Test API to validate Tidepool standards and processes.",
+  "name": "user-api",
+  "version": "0.0.3",
+  "description": "User API for handling logins and sessions",
   "main": "lib/index.js",
   "directories": {
     "lib": "./lib"
@@ -22,7 +22,6 @@
     "lodash": "~2.4.1",
     "moment": "~2.4.0",
     "mongojs": "~0.9.10",
-    "oauth2orize": "~1.0.1",
     "restify": "~2.6.0",
     "request": "~2.25.0"
   },

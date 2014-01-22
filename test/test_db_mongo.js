@@ -16,16 +16,23 @@
 'use strict';
 
 var expect = require('chai').expect;
-var dbmongo = require('../lib/db_mongo.js')({
-        mongoConnectionString: 'mongodb://localhost/test',
-          // the special config value we pass for testing will enable us to wipe the database
-          _wipeTheEntireDatabase: true,
-          adminKey: 'specialkey',
-          saltDeploy: 'randomsaltvalue',
-          logger: { error: console.log, warn: console.log, info: console.log}
-        });
+// expect violates this jshint thing a lot, so we just suppress it
+/* jshint expr: true */
 
-var shouldSucceed = function(err, result, code) {
+var dbmongo = require('../lib/db_mongo.js')({
+  mongoConnectionString: 'mongodb://localhost/test',
+  // the special config value we pass for testing will enable us to wipe the database
+  _wipeTheEntireDatabase: true,
+  adminKey: 'specialkey',
+  saltDeploy: 'randomsaltvalue',
+  logger: {
+    error: console.log,
+    warn: console.log,
+    info: console.log
+  }
+});
+
+var shouldSucceed = function (err, result, code) {
   if (err) {
     console.log(err);
   }
@@ -34,7 +41,7 @@ var shouldSucceed = function(err, result, code) {
   expect(result.statuscode).to.equal(code);
 };
 
-var shouldFail = function(err, result, code) {
+var shouldFail = function (err, result, code) {
   if (result) {
     console.log(result);
   }
@@ -46,36 +53,45 @@ var shouldFail = function(err, result, code) {
 
 
 
-describe('dbmongo:', function() {
-  describe('db_mongo basics', function() {
-    it('should have an app', function() {
+describe('dbmongo:', function () {
+  describe('db_mongo basics', function () {
+    it('should have an app', function () {
       expect(dbmongo).to.exist;
     });
-    it('should have status method', function() {
+    it('should have status method', function () {
       expect(dbmongo).to.respondTo('status');
     });
-    it('should have addUser method', function() {
+    it('should have addUser method', function () {
       expect(dbmongo).to.respondTo('addUser');
     });
-    it('should have getUser method', function() {
+    it('should have getUser method', function () {
       expect(dbmongo).to.respondTo('getUser');
     });
-    it('should have deleteUser method', function() {
+    it('should have deleteUser method', function () {
       expect(dbmongo).to.respondTo('deleteUser');
     });
   });
 
-  describe('db_mongo', function() {
+  describe('db_mongo', function () {
 
-    before(function(done) {
+    /* global before */
+    before(function (done) {
       expect(dbmongo).to.respondTo('_wipeTheEntireDatabase');
       dbmongo._wipeTheEntireDatabase(done);
     });
 
-    var user1 = {username: 'Testy', emails: ['mctesty@mctester.com'], password: 'test2'};
-    var user2 = {username: 'McTesty', emails: ['mctesty@tester.com'], password: 'test'};
+    var user1 = {
+      username: 'Testy',
+      emails: ['mctesty@mctester.com'],
+      password: 'test2'
+    };
+    var user2 = {
+      username: 'McTesty',
+      emails: ['mctesty@tester.com'],
+      password: 'test'
+    };
 
-    var checkResult = function(user, ref) {
+    var checkResult = function (user, ref) {
       expect(user).to.have.property('userid');
       expect(user).to.have.property('userhash');
       expect(user).to.have.property('username');
@@ -90,8 +106,8 @@ describe('dbmongo:', function() {
       expect(user.userid.length).to.equal(10);
     };
 
-    it('should have a good status return', function(done) {
-      dbmongo.status(function(err, result) {
+    it('should have a good status return', function (done) {
+      dbmongo.status(function (err, result) {
         shouldSucceed(err, result, 200);
         expect(result.running).to.be.true;
         expect(result.deps.down).to.be.empty;
@@ -99,8 +115,8 @@ describe('dbmongo:', function() {
       });
     });
 
-    it('should create a user', function(done) {
-      dbmongo.addUser(user1, function(err, result) {
+    it('should create a user', function (done) {
+      dbmongo.addUser(user1, function (err, result) {
         shouldSucceed(err, result, 201);
         checkResult(result.detail, user1);
         user1.userid = result.detail.userid;
@@ -109,15 +125,15 @@ describe('dbmongo:', function() {
       });
     });
 
-    it('should fail trying to recreate existing user', function(done) {
-      dbmongo.addUser(user1, function(err, result){
+    it('should fail trying to recreate existing user', function (done) {
+      dbmongo.addUser(user1, function (err, result) {
         shouldFail(err, result, 400);
         done();
       });
     });
 
-    it('should create a second user', function(done) {
-      dbmongo.addUser(user2, function(err, result){
+    it('should create a second user', function (done) {
+      dbmongo.addUser(user2, function (err, result) {
         shouldSucceed(err, result, 201);
         checkResult(result.detail, user2);
         user2.userid = result.detail.userid;
@@ -126,8 +142,10 @@ describe('dbmongo:', function() {
       });
     });
 
-    it('should find a user by username', function(done) {
-      dbmongo.getUser({user: user1.username}, function(err, result) {
+    it('should find a user by username', function (done) {
+      dbmongo.getUser({
+        user: user1.username
+      }, function (err, result) {
         shouldSucceed(err, result, 200);
         expect(result.detail.length).to.equal(1);
         checkResult(result.detail[0], user1);
@@ -135,8 +153,10 @@ describe('dbmongo:', function() {
       });
     });
 
-    it('should find a user by email', function(done) {
-      dbmongo.getUser({user: user2.emails[0]}, function(err, result) {
+    it('should find a user by email', function (done) {
+      dbmongo.getUser({
+        user: user2.emails[0]
+      }, function (err, result) {
         shouldSucceed(err, result, 200);
         expect(result.detail.length).to.equal(1);
         checkResult(result.detail[0], user2);
@@ -144,8 +164,11 @@ describe('dbmongo:', function() {
       });
     });
 
-    it('should find a user by email with a correct password', function(done) {
-      dbmongo.getUser({user: user2.emails[0], password: user2.password}, function(err, result) {
+    it('should find a user by email with a correct password', function (done) {
+      dbmongo.getUser({
+        user: user2.emails[0],
+        password: user2.password
+      }, function (err, result) {
         shouldSucceed(err, result, 200);
         expect(result.detail.length).to.equal(1);
         checkResult(result.detail[0], user2);
@@ -153,73 +176,100 @@ describe('dbmongo:', function() {
       });
     });
 
-    it('should fail to find a user by email with an incorrect password', function(done) {
-      dbmongo.getUser({user: user2.emails[0], password: user2.password + 'z'}, function(err, result) {
+    it('should fail to find a user by email with an incorrect password', function (done) {
+      dbmongo.getUser({
+        user: user2.emails[0],
+        password: user2.password + 'z'
+      }, function (err, result) {
         shouldSucceed(err, result, 204);
         done();
       });
     });
 
-    it('should error but not die when given an empty query', function(done) {
-      dbmongo.getUser({user: undefined}, function(err, result) {
+    it('should error but not die when given an empty query', function (done) {
+      dbmongo.getUser({
+        user: undefined
+      }, function (err, result) {
         shouldFail(err, result, 400);
         done();
       });
     });
 
-    it('should fail to find a nonexistent user by email', function(done) {
-      dbmongo.getUser({user: 't@mctester.com'}, function(err, result) {
+    it('should fail to find a nonexistent user by email', function (done) {
+      dbmongo.getUser({
+        user: 't@mctester.com'
+      }, function (err, result) {
         shouldSucceed(err, result, 204);
         done();
       });
     });
 
-    it('should fail to find a nonexistent user by name', function(done) {
-      dbmongo.getUser({user: 'foo'}, function(err, result) {
+    it('should fail to find a nonexistent user by name', function (done) {
+      dbmongo.getUser({
+        user: 'foo'
+      }, function (err, result) {
         shouldSucceed(err, result, 204);
         done();
       });
     });
 
 
-    it('should fail to delete multiple users with wildcards', function(done) {
+    it('should fail to delete multiple users with wildcards', function (done) {
       // wildcards don't work with mongo like this, but I want to be sure
-      dbmongo.deleteUser({userid: '.*', password: '.*'}, function(err, result) {
+      dbmongo.deleteUser({
+        userid: '.*',
+        password: '.*'
+      }, function (err, result) {
         shouldFail(err, result, 400);
         done();
       });
     });
 
-    it('should fail to do anything if the userid is null', function(done) {
-      dbmongo.deleteUser({userid: null, password: 'zzz'}, function(err, result) {
+    it('should fail to do anything if the userid is null', function (done) {
+      dbmongo.deleteUser({
+        userid: null,
+        password: 'zzz'
+      }, function (err, result) {
         shouldFail(err, result, 401);
         done();
       });
     });
 
-    it('should fail to delete a user with an invalid password', function(done) {
-      dbmongo.deleteUser({userid: user1.userid, password: 'zzz'}, function(err, result) {
+    it('should fail to delete a user with an invalid password', function (done) {
+      dbmongo.deleteUser({
+        userid: user1.userid,
+        password: 'zzz'
+      }, function (err, result) {
         shouldFail(err, result, 400);
         done();
       });
     });
 
-    it('should delete a user with a valid password', function(done) {
-      dbmongo.deleteUser({userid: user1.userid, password: user1.password}, function(err, result) {
+    it('should delete a user with a valid password', function (done) {
+      dbmongo.deleteUser({
+        userid: user1.userid,
+        password: user1.password
+      }, function (err, result) {
         shouldSucceed(err, result, 200);
         done();
       });
     });
 
-    it('should fail to delete a user given an invalid administrative key', function(done) {
-      dbmongo.deleteUser({userid: user2.userid, adminKey: 'zzz'}, function(err, result) {
+    it('should fail to delete a user given an invalid administrative key', function (done) {
+      dbmongo.deleteUser({
+        userid: user2.userid,
+        adminKey: 'zzz'
+      }, function (err, result) {
         shouldFail(err, result, 401);
         done();
       });
     });
 
-    it('should delete a user given a valid administrative key', function(done) {
-      dbmongo.deleteUser({userid: user2.userid, adminKey: 'specialkey'}, function(err, result) {
+    it('should delete a user given a valid administrative key', function (done) {
+      dbmongo.deleteUser({
+        userid: user2.userid,
+        adminKey: 'specialkey'
+      }, function (err, result) {
         shouldSucceed(err, result, 200);
         done();
       });
@@ -227,49 +277,61 @@ describe('dbmongo:', function() {
 
   });
 
-  describe('testing token store', function() {
+  describe('testing token store', function () {
 
-    it('should store a token', function(done) {
-      dbmongo.storeToken({token: 'whatever'}, function(err, result) {
+    it('should store a token', function (done) {
+      dbmongo.storeToken({
+        token: 'whatever'
+      }, function (err, result) {
         shouldSucceed(err, result, 201);
         done();
       });
     });
 
-    it('should find a token', function(done) {
-      dbmongo.findToken({token: 'whatever'}, function(err, result) {
+    it('should find a token', function (done) {
+      dbmongo.findToken({
+        token: 'whatever'
+      }, function (err, result) {
         shouldSucceed(err, result, 200);
         done();
       });
     });
-      
-    it('should fail to find a nonexistent token', function(done) {
-      dbmongo.findToken({token: 'missing'}, function(err, result) {
+
+    it('should fail to find a nonexistent token', function (done) {
+      dbmongo.findToken({
+        token: 'missing'
+      }, function (err, result) {
         shouldSucceed(err, result, 404);
         done();
       });
     });
 
-    it('should delete a token', function(done) {
-      dbmongo.deleteToken({token: 'whatever'}, function(err, result) {
+    it('should delete a token', function (done) {
+      dbmongo.deleteToken({
+        token: 'whatever'
+      }, function (err, result) {
         shouldSucceed(err, result, 200);
         done();
       });
     });
-      
-    it('should fail to delete a deleted token', function(done) {
-      dbmongo.deleteToken({token: 'whatever'}, function(err, result) {
+
+    it('should fail to delete a deleted token', function (done) {
+      dbmongo.deleteToken({
+        token: 'whatever'
+      }, function (err, result) {
         shouldSucceed(err, result, 404);
         done();
       });
     });
 
-    it('should fail to delete a nonexistent token', function(done) {
-      dbmongo.deleteToken({token: 'missing'}, function(err, result) {
+    it('should fail to delete a nonexistent token', function (done) {
+      dbmongo.deleteToken({
+        token: 'missing'
+      }, function (err, result) {
         shouldSucceed(err, result, 404);
         done();
       });
     });
-      
+
   });
 });
