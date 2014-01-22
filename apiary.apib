@@ -12,11 +12,13 @@ User related resources of the **User API**
 
 ## Status [/status]
 ### Retrieve status information [GET]
-Returns a status health check with a list of status of its dependencies
+Returns a status health check with a list of status of its dependencies. 
+If the server is operating properly and all dependencies are up and 
+running, returns 200, otherwise 500. In either case, the body contains a 
+list of up and down dependencies.
+
 
 + Response 200
-
-        If the server is operating properly and all dependencies are up and running.
 
         {
             "up" : [ "mongo" ],
@@ -68,38 +70,6 @@ Returns whatever status it was sent as a parameter
 + Response 401
 
         When the username/password combination fails.
-
-## Machine Login [/serverlogin]
-### Log in an existing user [POST]
-+ Request
-
-    + Headers
-    
-            X-Tidepool-Server-Name: OtherServer
-            X-Tidepool-Server-Secret: serversharedsecret
-            
-
-+ Response 200 (application/json)
-
-    + Headers
-
-            x-tidepool-session-token : 66sadf99.123adf840.aasd90JKj
-
-    + Body
-    
-            {
-              "userid": "ebe58036a5",
-              "username": "user@tidepool.org,
-              "emails" : [ "email1@foo.com" ]
-            }
-            
-+ Response 401
-
-        When the servername/secret combination fails.
-        
-+ Response 400
-
-        When the login info is improperly set up or not supported by this installation
 
 ### Refresh a session token [GET]
 
@@ -240,6 +210,39 @@ be a bad idea.
 + Response 404
 
         When the userid was not found.
+
+
+
+## Check token validity [/token/{usertoken}]
+### Check to see if a token is valid [GET]
+
+    The session token passed in must be a server-side token. This request is valid only for Tidepool servers.
+    The userid returned is the userid associated with the usertoken.
+
+
+
++ Parameters
+    + usertoken (required, string, `123123abcd`) ... Tidepool-assigned user token
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 44sadf87.12x3840.aasd90JKj
+
++ Response 200 (application/json)
+    + Body
+    
+            {
+              "userid": userid,
+            }
+
++ Response 401
+
+        When the session token is invalid or not provided.
+
++ Response 404
+
+        When the usertoken was not found in the token store.
 
 
 
