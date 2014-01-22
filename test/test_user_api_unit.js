@@ -35,7 +35,7 @@ var dbmongo = require('../lib/db_mongo.js')(env);
 var userapi = require('../lib/userapi.js')(env, dbmongo);
 
 var restify = require('restify');
-var server = restify.createServer({ name: "testUserApi" });
+var server = restify.createServer({ name: 'testUserApi' });
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 userapi.attachToServer(server);
@@ -62,35 +62,35 @@ describe('userapi', function(){
 
     it('should respond with 200', function(done) {
       supertest
-        .get('/status')
-        .expect(200)
-        .end(function(err, obj) {
-               if (err) return done(err);
-               expect(err).to.not.exist;
-               expect(obj.res.body.down).to.eql([]);
-               expect(obj.res.body.up).to.eql(['mongo']);
-               done();
-             });
+      .get('/status')
+      .expect(200)
+      .end(function(err, obj) {
+       if (err) return done(err);
+       expect(err).to.not.exist;
+       expect(obj.res.body.down).to.eql([]);
+       expect(obj.res.body.up).to.eql(['mongo']);
+       done();
+     });
     });
 
     it('should respond with 403 if you set status to 403', function(done) {
       supertest
-        .get('/status?status=403')
-        .expect(403)
-        .end(function(err, obj) {
-               if (err) return done(err);
-               done();
-             });
+      .get('/status?status=403')
+      .expect(403)
+      .end(function(err, obj) {
+       if (err) return done(err);
+       done();
+     });
     });
 
     it('should ignore extra query parameters', function(done) {
       supertest
-        .get('/status?bogus=whatever')
-        .expect(200)
-        .end(function(err, obj) {
-               if (err) return done(err);
-               done();
-             });
+      .get('/status?bogus=whatever')
+      .expect(200)
+      .end(function(err, obj) {
+       if (err) return done(err);
+       done();
+     });
     });
 
   });
@@ -99,12 +99,12 @@ describe('userapi', function(){
 
     it('should respond with 404', function(done) {
       supertest
-        .get('/nonexistent')
-        .expect(404)
-        .end(function(err, obj) {
-               if (err) return done(err);
-               done();
-             });
+      .get('/nonexistent')
+      .expect(404)
+      .end(function(err, obj) {
+       if (err) return done(err);
+       done();
+     });
     });
 
   });
@@ -113,12 +113,12 @@ describe('userapi', function(){
 
     it('should respond with 405', function(done) {
       supertest
-        .post('/status')
-        .expect(405)
-        .end(function(err, obj) {
-               if (err) return done(err);
-               done();
-             });
+      .post('/status')
+      .expect(405)
+      .end(function(err, obj) {
+       if (err) return done(err);
+       done();
+     });
     });
 
   });
@@ -127,13 +127,13 @@ describe('userapi', function(){
 
     it('should respond with 400', function(done) {
       supertest
-        .post('/user')
-        .send('junk')
-        .expect(400)
-        .end(function(err, obj) {
-               if (err) return done(err);
-               done();
-             });
+      .post('/user')
+      .send('junk')
+      .expect(400)
+      .end(function(err, obj) {
+       if (err) return done(err);
+       done();
+     });
     });
 
   });
@@ -142,15 +142,15 @@ describe('userapi', function(){
 
     it('should respond with 401', function(done) {
       supertest
-        .post('/login')
-        .set('X-Tidepool-UserID', 'badid')
-        .set('X-Tidepool-Password', 'abcdef1234567890')
-        .expect(401)
-        .end(function(err, res) {
-               if (err) return done(err);
-               expect(res.body).to.equal('login failed');
-               done();
-             });
+      .post('/login')
+      .set('X-Tidepool-UserID', 'badid')
+      .set('X-Tidepool-Password', 'abcdef1234567890')
+      .expect(401)
+      .end(function(err, res) {
+       if (err) return done(err);
+       expect(res.body).to.equal('login failed');
+       done();
+     });
     });
 
   });
@@ -169,20 +169,20 @@ describe('userapi', function(){
 
       it('should respond with 201', function(done) {
         supertest
-          .post('/user')
-          .send(user)
-          .expect(201)
-          .end(function(err, obj) {
-                 if (err) return done(err);
-                 expect(obj.res.body.username).to.equal(user.username);
-                 expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
-                 expect(obj.res.body.userid).to.exist;
-                 expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
-                 user.userid = obj.res.body.userid;
-                 expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
-                 sessionToken = obj.res.headers['x-tidepool-session-token'];
-                 done();
-               });
+        .post('/user')
+        .send(user)
+        .expect(201)
+        .end(function(err, obj) {
+         if (err) return done(err);
+         expect(obj.res.body.username).to.equal(user.username);
+         expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+         expect(obj.res.body.userid).to.exist;
+         expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
+         user.userid = obj.res.body.userid;
+         expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+         sessionToken = obj.res.headers['x-tidepool-session-token'];
+         done();
+       });
       });
     });
 
@@ -190,13 +190,13 @@ describe('userapi', function(){
 
       it('should respond with 200 and log out', function(done) {
         supertest
-          .post('/logout')
-          .set('X-Tidepool-Session-Token', sessionToken)
-          .expect(200)
-          .end(function(err, res) {
-                 if (err) return done(err);
-                 done();
-               });
+        .post('/logout')
+        .set('X-Tidepool-Session-Token', sessionToken)
+        .expect(200)
+        .end(function(err, res) {
+         if (err) return done(err);
+         done();
+       });
       });
 
     });
@@ -205,14 +205,14 @@ describe('userapi', function(){
     describe('POST /login for that user with a slightly bad password', function() {
       it('should respond with 401', function(done) {
         supertest
-          .post('/login')
-          .set('X-Tidepool-UserID', user.username)
-          .set('X-Tidepool-Password', user.password + 'x')
-          .expect(401)
-          .end(function(err, obj) {
-                 if (err) return done(err);
-                 done();
-               });
+        .post('/login')
+        .set('X-Tidepool-UserID', user.username)
+        .set('X-Tidepool-Password', user.password + 'x')
+        .expect(401)
+        .end(function(err, obj) {
+         if (err) return done(err);
+         done();
+       });
       });
     });
 
@@ -220,16 +220,16 @@ describe('userapi', function(){
 
       it('should respond with 200 and a session token', function(done) {
         supertest
-          .post('/login')
-          .set('X-Tidepool-UserID', user.username)
-          .set('X-Tidepool-Password', user.password)
-          .expect(200)
-          .end(function(err, obj) {
-                 if (err) return done(err);
-                 expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
-                 sessionToken = obj.res.headers['x-tidepool-session-token'];
-                 done();
-               });
+        .post('/login')
+        .set('X-Tidepool-UserID', user.username)
+        .set('X-Tidepool-Password', user.password)
+        .expect(200)
+        .end(function(err, obj) {
+         if (err) return done(err);
+         expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+         sessionToken = obj.res.headers['x-tidepool-session-token'];
+         done();
+       });
       });
     });
 
@@ -237,19 +237,19 @@ describe('userapi', function(){
 
       it('should respond with 200 and user info', function(done) {
         supertest
-          .get('/user')
-          .set('X-Tidepool-Session-Token', sessionToken)
-          .expect(200)
-          .end(function(err, obj) {
-                 if (err) return done(err);
-                 expect(obj.res.body.username).to.exist;
-                 expect(obj.res.body.username).to.equal(user.username);
-                 expect(obj.res.body.emails).to.exist;
-                 expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
-                 expect(obj.res.body.userid).to.exist;
-                 expect(obj.res.body.userid).to.equal(user.userid);
-                 done();
-               });
+        .get('/user')
+        .set('X-Tidepool-Session-Token', sessionToken)
+        .expect(200)
+        .end(function(err, obj) {
+         if (err) return done(err);
+         expect(obj.res.body.username).to.exist;
+         expect(obj.res.body.username).to.equal(user.username);
+         expect(obj.res.body.emails).to.exist;
+         expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+         expect(obj.res.body.userid).to.exist;
+         expect(obj.res.body.userid).to.equal(user.userid);
+         done();
+       });
       });
     });
 
@@ -257,18 +257,18 @@ describe('userapi', function(){
 
       it('should return 200 with a new token and the user ID', function(done) {
         supertest
-          .get('/login')
-          .set('X-Tidepool-Session-Token', sessionToken)
-          .expect(200)
-          .end(function(err, obj) {
-                 if (err) return done(err);
-                 expect(obj.res.body.userid).to.equal(user.userid);
-                 expect(obj.res.headers['x-tidepool-session-token']).to.exist;
-                 expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(sessionToken);
-                 oldToken = sessionToken;
-                 sessionToken = obj.res.headers['x-tidepool-session-token'];
-                 done();
-               });
+        .get('/login')
+        .set('X-Tidepool-Session-Token', sessionToken)
+        .expect(200)
+        .end(function(err, obj) {
+         if (err) return done(err);
+         expect(obj.res.body.userid).to.equal(user.userid);
+         expect(obj.res.headers['x-tidepool-session-token']).to.exist;
+         expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(sessionToken);
+         oldToken = sessionToken;
+         sessionToken = obj.res.headers['x-tidepool-session-token'];
+         done();
+       });
       });
 
     });
@@ -277,13 +277,13 @@ describe('userapi', function(){
 
       it('should return 401', function(done) {
         supertest
-          .get('/login')
-          .set('X-Tidepool-Session-Token', oldToken)
-          .expect(401)
-          .end(function(err, obj) {
-                 if (err) return done(err);
-                 done();
-               });
+        .get('/login')
+        .set('X-Tidepool-Session-Token', oldToken)
+        .expect(401)
+        .end(function(err, obj) {
+         if (err) return done(err);
+         done();
+       });
       });
     });
 
@@ -292,12 +292,12 @@ describe('userapi', function(){
 
       it('should respond with 401', function(done) {
         supertest
-          .post('/logout')
-          .expect(401)
-          .end(function(err, res) {
-                 if (err) return done(err);
-                 done();
-               });
+        .post('/logout')
+        .expect(401)
+        .end(function(err, res) {
+         if (err) return done(err);
+         done();
+       });
       });
 
     });
@@ -306,13 +306,13 @@ describe('userapi', function(){
 
       it('should respond with 200', function(done) {
         supertest
-          .post('/logout')
-          .set('X-Tidepool-Session-Token', sessionToken)
-          .expect(200)
-          .end(function(err, res) {
-                 if (err) return done(err);
-                 done();
-               });
+        .post('/logout')
+        .set('X-Tidepool-Session-Token', sessionToken)
+        .expect(200)
+        .end(function(err, res) {
+         if (err) return done(err);
+         done();
+       });
       });
 
     });
@@ -321,12 +321,12 @@ describe('userapi', function(){
 
       it('should respond with 401', function(done) {
         supertest
-          .get('/user/' + user.userid)
-          .expect(401)
-          .end(function(err, res) {
-                 if (err) return done(err);
-                 done();
-               });
+        .get('/user/' + user.userid)
+        .expect(401)
+        .end(function(err, res) {
+         if (err) return done(err);
+         done();
+       });
       });
 
     });
@@ -335,13 +335,13 @@ describe('userapi', function(){
 
       it('should respond with 401 and no user info', function(done) {
         supertest
-          .get('/user')
-          .expect(401)
-          .end(function(err, obj) {
-                 if (err) return done(err);
-                 expect(obj.res.body).to.equal('Unauthorized');
-                 done();
-               });
+        .get('/user')
+        .expect(401)
+        .end(function(err, obj) {
+         if (err) return done(err);
+         expect(obj.res.body).to.equal('Unauthorized');
+         done();
+       });
       });
     });
 
@@ -350,185 +350,185 @@ describe('userapi', function(){
 
 
 describe('Create and manage a user as a machine', function() {
-    var user = {
-        username: 'anotheruser',
-        emails: ['buzz@bazz.com'],
-        password: 'R6asd$=aTBgfj&7jqZ7'
-    };
+  var user = {
+    username: 'anotheruser',
+    emails: ['buzz@bazz.com'],
+    password: 'R6asd$=aTBgfj&7jqZ7'
+  };
 
-    var sessionToken = null;
-    var serverToken = null;
+  var sessionToken = null;
+  var serverToken = null;
 
-    describe('POST /user with a complete payload to create a new user and log in', function() {
+  describe('POST /user with a complete payload to create a new user and log in', function() {
 
-        it('should respond with 201', function(done) {
-            supertest
-            .post('/user')
-            .send(user)
-            .expect(201)
-            .end(function(err, obj) {
-                if (err) return done(err);
-                expect(obj.res.body.username).to.equal(user.username);
-                expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
-                expect(obj.res.body.userid).to.exist;
-                expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
-                user.userid = obj.res.body.userid;
-                expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
-                sessionToken = obj.res.headers['x-tidepool-session-token'];
-                done();
-            });
-        });
+    it('should respond with 201', function(done) {
+      supertest
+      .post('/user')
+      .send(user)
+      .expect(201)
+      .end(function(err, obj) {
+        if (err) return done(err);
+        expect(obj.res.body.username).to.equal(user.username);
+        expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+        expect(obj.res.body.userid).to.exist;
+        expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
+        user.userid = obj.res.body.userid;
+        expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+        sessionToken = obj.res.headers['x-tidepool-session-token'];
+        done();
+      });
     });
+  });
 
-    describe('POST /serverlogin with good secret', function() {
+  describe('POST /serverlogin with good secret', function() {
 
-        it('should respond with 200 and a session token', function(done) {
-            supertest
-            .post('/serverlogin')
-            .set('X-Tidepool-Server-Name', 'Test Server')
-            .set('X-Tidepool-Server-Secret', env.serverSecret)
-            .expect(200)
-            .end(function(err, obj) {
-                if (err) return done(err);
-                expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
-                serverToken = obj.res.headers['x-tidepool-session-token'];
-                expect(serverToken).to.not.equal(sessionToken);
-                done();
-            });
-        });
+    it('should respond with 200 and a session token', function(done) {
+      supertest
+      .post('/serverlogin')
+      .set('X-Tidepool-Server-Name', 'Test Server')
+      .set('X-Tidepool-Server-Secret', env.serverSecret)
+      .expect(200)
+      .end(function(err, obj) {
+        if (err) return done(err);
+        expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+        serverToken = obj.res.headers['x-tidepool-session-token'];
+        expect(serverToken).to.not.equal(sessionToken);
+        done();
+      });
     });
+  });
 
-    describe('GET /user/:id while logged in', function() {
+  describe('GET /user/:id while logged in', function() {
 
-        it('should respond with 200 and user info', function(done) {
-            supertest
-            .get('/user/' + user.userid)
-            .set('X-Tidepool-Session-Token', serverToken)
-            .expect(200)
-            .end(function(err, obj) {
-                if (err) return done(err);
-                expect(obj.res.body.username).to.exist;
-                expect(obj.res.body.username).to.equal(user.username);
-                expect(obj.res.body.emails).to.exist;
-                expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
-                expect(obj.res.body.userid).to.exist;
-                expect(obj.res.body.userid).to.equal(user.userid);
-                done();
-            });
-        });
+    it('should respond with 200 and user info', function(done) {
+      supertest
+      .get('/user/' + user.userid)
+      .set('X-Tidepool-Session-Token', serverToken)
+      .expect(200)
+      .end(function(err, obj) {
+        if (err) return done(err);
+        expect(obj.res.body.username).to.exist;
+        expect(obj.res.body.username).to.equal(user.username);
+        expect(obj.res.body.emails).to.exist;
+        expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+        expect(obj.res.body.userid).to.exist;
+        expect(obj.res.body.userid).to.equal(user.userid);
+        done();
+      });
     });
+  });
 
-    describe('GET /token/:token without a valid serverToken', function() {
-        it('should respond with 401', function(done) {
-            supertest
-            .get('/token/' + sessionToken)
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(401)
-            .end(function(err, obj) {
-                 if (err) return done(err);
-                 expect(obj.res.body).to.equal('Unauthorized');
-                 done();
-               });
-        });
+  describe('GET /token/:token without a valid serverToken', function() {
+    it('should respond with 401', function(done) {
+      supertest
+      .get('/token/' + sessionToken)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(401)
+      .end(function(err, obj) {
+       if (err) return done(err);
+       expect(obj.res.body).to.equal('Unauthorized');
+       done();
+     });
     });
+  });
 
-    describe('GET /token/:token with valid serverToken', function() {
-        it('should respond with 200 and user info', function(done) {
-            supertest
-            .get('/token/' + sessionToken)
-            .set('X-Tidepool-Session-Token', serverToken)
-            .expect(200)
-            .end(function(err, obj) {
-                if (err) return done(err);
+  describe('GET /token/:token with valid serverToken', function() {
+    it('should respond with 200 and user info', function(done) {
+      supertest
+      .get('/token/' + sessionToken)
+      .set('X-Tidepool-Session-Token', serverToken)
+      .expect(200)
+      .end(function(err, obj) {
+        if (err) return done(err);
                 // console.log(obj.res.body);
                 expect(obj.res.body.userid).to.exist;
                 expect(obj.res.body.userid).to.exist;
                 expect(obj.res.body.userid).to.equal(user.userid);
                 done();
-            });
-        });
+              });
+    });
+  });
+
+  describe('GET /login to refresh machine user', function() {
+
+    it('should return 200 with a new token and the user ID', function(done) {
+      supertest
+      .get('/login')
+      .set('X-Tidepool-Session-Token', serverToken)
+      .expect(200)
+      .end(function(err, obj) {
+        if (err) return done(err);
+        expect(obj.res.body.userid).to.equal('Test Server');
+        expect(obj.res.headers['x-tidepool-session-token']).to.exist;
+        expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(serverToken);
+        serverToken = obj.res.headers['x-tidepool-session-token'];
+        done();
+      });
     });
 
-    describe('GET /login to refresh machine user', function() {
+  });
 
-        it('should return 200 with a new token and the user ID', function(done) {
-            supertest
-            .get('/login')
-            .set('X-Tidepool-Session-Token', serverToken)
-            .expect(200)
-            .end(function(err, obj) {
-                if (err) return done(err);
-                expect(obj.res.body.userid).to.equal('Test Server');
-                expect(obj.res.headers['x-tidepool-session-token']).to.exist;
-                expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(serverToken);
-                serverToken = obj.res.headers['x-tidepool-session-token'];
-                done();
-            });
-         });
+  describe('POST /logout with valid session token', function() {
 
+    it('should respond with 200 and log out', function(done) {
+      supertest
+      .post('/logout')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
     });
 
-    describe('POST /logout with valid session token', function() {
+  });
 
-        it('should respond with 200 and log out', function(done) {
-            supertest
-            .post('/logout')
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(200)
-            .end(function(err, res) {
-                if (err) return done(err);
-                done();
-            });
-        });
+  describe('POST /logout with valid server token', function() {
 
+    it('should respond with 200', function(done) {
+      supertest
+      .post('/logout')
+      .set('X-Tidepool-Session-Token', serverToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
     });
 
-    describe('POST /logout with valid server token', function() {
-
-        it('should respond with 200', function(done) {
-            supertest
-            .post('/logout')
-            .set('X-Tidepool-Session-Token', serverToken)
-            .expect(200)
-            .end(function(err, res) {
-                if (err) return done(err);
-                done();
-            });
-        });
-
-    });
+  });
 
 });
 
 
-  describe('GET /login', function() {
+describe('GET /login', function() {
 
-    it('should respond with 404', function() {
-      supertest
-        .get('/login')
-        .expect(404);
-    });
-
+  it('should respond with 404', function() {
+    supertest
+    .get('/login')
+    .expect(404);
   });
 
-  describe('POST /user without any data', function() {
+});
 
-    it('should respond with 400', function() {
-      supertest
-        .post('/status')
-        .expect(400);
-    });
+describe('POST /user without any data', function() {
 
+  it('should respond with 400', function() {
+    supertest
+    .post('/status')
+    .expect(400);
   });
 
-  describe('GET /login', function() {
+});
 
-    it('should respond with 404', function() {
-      supertest
-        .get('/login')
-        .expect(404);
-    });
+describe('GET /login', function() {
 
+  it('should respond with 404', function() {
+    supertest
+    .get('/login')
+    .expect(404);
   });
+
+});
 });
 
