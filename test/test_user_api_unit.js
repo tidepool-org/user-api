@@ -365,7 +365,7 @@ describe('Create and manage a user as a machine', function() {
     };
 
     var sessionToken = null;
-    var oldToken = null;
+    var serverToken = null;
 
     describe('POST /user with a complete payload to create a new user and log in', function() {
 
@@ -388,21 +388,6 @@ describe('Create and manage a user as a machine', function() {
         });
     });
 
-    describe('POST /logout with valid session token #1', function() {
-
-        it('should respond with 200 and log out', function(done) {
-            supertest
-            .post('/logout')
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(200)
-            .end(function(err, res) {
-                if (err) return done(err);
-                done();
-            });
-        });
-
-    });
-
     describe('POST /serverlogin with good secret', function() {
 
         it('should respond with 200 and a session token', function(done) {
@@ -414,7 +399,7 @@ describe('Create and manage a user as a machine', function() {
             .end(function(err, obj) {
                 if (err) return done(err);
                 expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
-                sessionToken = obj.res.headers['x-tidepool-session-token'];
+                serverToken = obj.res.headers['x-tidepool-session-token'];
                 done();
             });
         });
@@ -425,7 +410,41 @@ describe('Create and manage a user as a machine', function() {
         it('should respond with 200 and user info', function(done) {
             supertest
             .get('/user/' + user.userid)
+            .set('X-Tidepool-Session-Token', serverToken)
+            .expect(200)
+            .end(function(err, obj) {
+                if (err) return done(err);
+                // console.log(obj.res.body);
+                expect(obj.res.body.username).to.exist;
+                expect(obj.res.body.username).to.equal(user.username);
+                expect(obj.res.body.emails).to.exist;
+                expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+                expect(obj.res.body.userid).to.exist;
+                expect(obj.res.body.userid).to.equal(user.userid);
+                done();
+            });
+        });
+    });
+
+    describe('GET /token/:token without a valid serverToken', function() {
+        it('should respond with 401', function(done) {
+            supertest
+            .get('/token/' + sessionToken)
             .set('X-Tidepool-Session-Token', sessionToken)
+            .expect(401)
+            .end(function(err, obj) {
+                 if (err) return done(err);
+                 expect(obj.res.body).to.not.exist;
+                 done();
+               });
+        });
+    });
+
+    describe('GET /token/:token with valid serverToken', function() {
+        it('should respond with 200 and user info', function(done) {
+            supertest
+            .get('/token/' + sessionToken)
+            .set('X-Tidepool-Session-Token', serverToken)
             .expect(200)
             .end(function(err, obj) {
                 if (err) return done(err);
@@ -446,7 +465,7 @@ describe('Create and manage a user as a machine', function() {
         it('should return 200 with a new token and the user ID', function(done) {
             supertest
             .get('/login')
-            .set('X-Tidepool-Session-Token', sessionToken)
+            .set('X-Tidepool-Session-Token', serverToken)
             .expect(200)
             .end(function(err, obj) {
                 if (err) return done(err);
@@ -454,8 +473,7 @@ describe('Create and manage a user as a machine', function() {
                 // console.log(obj.res.body);
                 expect(obj.res.body.userid).to.equal('Test Server');
                 expect(obj.res.headers['x-tidepool-session-token']).to.exist;
-                expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(sessionToken);
-                oldToken = sessionToken;
+                expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(serverToken);
                 sessionToken = obj.res.headers['x-tidepool-session-token'];
                 done();
             });
@@ -463,27 +481,27 @@ describe('Create and manage a user as a machine', function() {
 
     });
 
-    describe('GET /login with old token', function() {
+    describe('POST /logout with valid session token', function() {
 
-        it('should return 401', function(done) {
+        it('should respond with 200 and log out', function(done) {
             supertest
-            .get('/login')
-            .set('X-Tidepool-Session-Token', oldToken)
-            .expect(401)
-            .end(function(err, obj) {
+            .post('/logout')
+            .set('X-Tidepool-Session-Token', sessionToken)
+            .expect(200)
+            .end(function(err, res) {
                 if (err) return done(err);
                 done();
             });
-         });
+        });
+
     });
 
-
-    describe('POST /logout with valid session token #2', function() {
+    describe('POST /logout with valid server token', function() {
 
         it('should respond with 200', function(done) {
             supertest
             .post('/logout')
-            .set('X-Tidepool-Session-Token', sessionToken)
+            .set('X-Tidepool-Session-Token', serverToken)
             .expect(200)
             .end(function(err, res) {
                 if (err) return done(err);
