@@ -70,6 +70,9 @@ describe('dbmongo:', function () {
     it('should have deleteUser method', function () {
       expect(dbmongo).to.respondTo('deleteUser');
     });
+    it('should have generateUniqueHash method', function () {
+      expect(dbmongo).to.respondTo('generateUniqueHash');
+    });
   });
 
   describe('db_mongo', function () {
@@ -330,6 +333,28 @@ describe('dbmongo:', function () {
       }, function (err, result) {
         shouldSucceed(err, result, 404);
         done();
+      });
+    });
+
+    it('should generate a 10-character hash that varies from call to call', function (done) {
+      dbmongo.generateUniqueHash(['this', 'is', 'a', 'test'], 10, function (result) {
+        expect(result).to.match(/[a-f0-9]{10}/);
+        dbmongo.generateUniqueHash(['this', 'is', 'a', 'test'], 10, function (result2) {
+          expect(result2).to.match(/[a-f0-9]{10}/);
+          expect(result2).to.not.equal(result);
+          done();
+        });
+      });
+    });
+
+    it('should generate a 24-character hash that varies from call to call', function (done) {
+      dbmongo.generateUniqueHash(['this', 'is', 'a', 'test'], 24, function (result) {
+        expect(result).to.match(/[a-f0-9]{24}/);
+        dbmongo.generateUniqueHash(['this', 'is', 'a', 'test'], 24, function (result2) {
+          expect(result2).to.match(/[a-f0-9]{24}/);
+          expect(result2).to.not.equal(result);
+          done();
+        });
       });
     });
 
