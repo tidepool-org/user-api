@@ -440,7 +440,7 @@ describe('userapi', function () {
       });
     });
 
-    describe('GET /token/:token with valid serverToken', function () {
+    describe('GET /token/:token for sessionToken with valid serverToken', function () {
       it('should respond with 200 and user info', function (done) {
         supertest
           .get('/token/' + sessionToken)
@@ -452,6 +452,25 @@ describe('userapi', function () {
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal(user.userid);
+            expect(obj.res.body.server).to.equal(false);
+            done();
+          });
+      });
+    });
+
+    describe('GET /token/:token for serverToken with a valid serverToken', function () {
+      it('should respond with 200 and user info', function (done) {
+        supertest
+          .get('/token/' + serverToken)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            // console.log(obj.res.body);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.equal('Test Server');
+            expect(obj.res.body.server).to.equal(true);
             done();
           });
       });
@@ -473,6 +492,173 @@ describe('userapi', function () {
             done();
           });
       });
+
+    });
+
+    describe('GET /token/:token for serverToken with regenerated serverToken', function () {
+      it('should respond with 200 and user info', function (done) {
+        supertest
+          .get('/token/' + serverToken)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            // console.log(obj.res.body);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.equal('Test Server');
+            expect(obj.res.body.server).to.equal(true);
+            done();
+          });
+      });
+    });
+
+    describe('GET /private with no name to retrieve a randomly generated id/hash pair', function() {
+
+      it('should return 200 with an id/hash in the response', function (done) {
+        supertest
+          .get('/private?some=data&something=else')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.name).to.equal('');
+            expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
+            expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
+            done();
+          });
+      });
+
+    });
+
+    describe('Exercise /private/name to retrieve and store id/hash with a name for a user', function() {
+
+      var name1 = {name: 'testname'};
+      var name2 = {name: 'differentname'};
+
+      it('POST should return 200 with an id/hash in the response', function (done) {
+        supertest
+          .post('/private/' + user.userid + '/' + name1.name)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(201)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            console.log(obj.res.body);
+            expect(obj.res.body.id).to.exist;
+            expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
+            expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
+            done();
+          });
+      });
+
+      it('should return 404 if there is no name field', function (done) {
+        supertest
+          .post('/private/' + user.userid)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(404)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            done();
+          });
+      });
+
+      it('should return 401 if authorization token is not a server token', function (done) {
+        supertest
+          .post('/private/' + user.userid + '/validname')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(401)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            done();
+          });
+      });
+
+      it('should return 422 if you try to post the same name twice', function (done) {
+        supertest
+          .post('/private/' + user.userid + '/' + name1.name)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(422)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            done();
+          });
+      });
+
+      it('should accept a different name with additional salt', function (done) {
+        supertest
+          .post('/private/' + user.userid + '/' + name2.name + '?extra=salt')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(201)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.id).to.exist;
+            expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
+            expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
+            done();
+          });
+      });
+
+      it('should fetch a name, return 200 with an id/hash', function (done) {
+        supertest
+          .get('/private/' + user.userid + '/' + name1.name )
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.id).to.exist;
+            expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
+            expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
+            done();
+          });
+      });
+
+      it('should return 404 if the name does not exist', function (done) {
+        supertest
+          .get('/private' + user.userid + '/junkname')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(404)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            done();
+          });
+      });
+
+      // need a PUT test
+
+      // skipping delete tests for now
+      it.skip('should delete a name, return 204', function (done) {
+        supertest
+          .del('/private/' + user.userid + '/' + name1.name )
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            done();
+          });
+      });
+
+      it.skip('should return 404 because the name no longer exists', function (done) {
+        supertest
+          .get('/private/' + user.userid + '/' + name1.name)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(404)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            done();
+          });
+      });
+
+      it.skip('should delete the other name, return 204', function (done) {
+        supertest
+          .delete('/private/' + name2.name )
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            done();
+          });
+      });
+
 
     });
 

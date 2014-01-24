@@ -67,6 +67,9 @@ describe('dbmongo:', function () {
     it('should have getUser method', function () {
       expect(dbmongo).to.respondTo('getUser');
     });
+    it('should have updateUser method', function () {
+      expect(dbmongo).to.respondTo('updateUser');
+    });
     it('should have deleteUser method', function () {
       expect(dbmongo).to.respondTo('deleteUser');
     });
@@ -175,6 +178,22 @@ describe('dbmongo:', function () {
         shouldSucceed(err, result, 200);
         expect(result.detail.length).to.equal(1);
         checkResult(result.detail[0], user2);
+        done();
+      });
+    });
+
+    it('should update a user with a new field', function (done) {
+      dbmongo.updateUser(user2.userid, {
+        pi100: 314, 
+        'object.foo': 'bar', 
+        'object.buzz': 'bazz' 
+      }, function (err, result) {
+        shouldSucceed(err, result, 200);
+        expect(result.detail.pi100).to.equal(314);
+        expect(result.detail.object.foo).to.equal('bar');
+        expect(result.detail.object.buzz).to.equal('bazz');
+        console.log(result);
+        checkResult(result.detail, user2);
         done();
       });
     });
