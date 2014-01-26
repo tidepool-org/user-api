@@ -67,8 +67,14 @@ describe('dbmongo:', function () {
     it('should have getUser method', function () {
       expect(dbmongo).to.respondTo('getUser');
     });
+    it('should have updateUser method', function () {
+      expect(dbmongo).to.respondTo('updateUser');
+    });
     it('should have deleteUser method', function () {
       expect(dbmongo).to.respondTo('deleteUser');
+    });
+    it('should have generateUniqueHash method', function () {
+      expect(dbmongo).to.respondTo('generateUniqueHash');
     });
   });
 
@@ -172,6 +178,21 @@ describe('dbmongo:', function () {
         shouldSucceed(err, result, 200);
         expect(result.detail.length).to.equal(1);
         checkResult(result.detail[0], user2);
+        done();
+      });
+    });
+
+    it('should update a user with a new field', function (done) {
+      dbmongo.updateUser(user2.userid, {
+        pi100: 314,
+        'object.foo': 'bar',
+        'object.buzz': 'bazz'
+      }, function (err, result) {
+        shouldSucceed(err, result, 200);
+        expect(result.detail.pi100).to.equal(314);
+        expect(result.detail.object.foo).to.equal('bar');
+        expect(result.detail.object.buzz).to.equal('bazz');
+        checkResult(result.detail, user2);
         done();
       });
     });
@@ -330,6 +351,28 @@ describe('dbmongo:', function () {
       }, function (err, result) {
         shouldSucceed(err, result, 404);
         done();
+      });
+    });
+
+    it('should generate a 10-character hash that varies from call to call', function (done) {
+      dbmongo.generateUniqueHash(['this', 'is', 'a', 'test'], 10, function (result) {
+        expect(result).to.match(/[a-f0-9]{10}/);
+        dbmongo.generateUniqueHash(['this', 'is', 'a', 'test'], 10, function (result2) {
+          expect(result2).to.match(/[a-f0-9]{10}/);
+          expect(result2).to.not.equal(result);
+          done();
+        });
+      });
+    });
+
+    it('should generate a 24-character hash that varies from call to call', function (done) {
+      dbmongo.generateUniqueHash(['this', 'is', 'a', 'test'], 24, function (result) {
+        expect(result).to.match(/[a-f0-9]{24}/);
+        dbmongo.generateUniqueHash(['this', 'is', 'a', 'test'], 24, function (result2) {
+          expect(result2).to.match(/[a-f0-9]{24}/);
+          expect(result2).to.not.equal(result);
+          done();
+        });
       });
     });
 
