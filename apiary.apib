@@ -1,0 +1,248 @@
+FORMAT: 1A
+HOST: http://tidepool.io
+
+# tidepool-user-api
+The Tidepool User API is used to manage the user login information and pretty much nothing else.
+Temporarily, it also manages sessions. That will change.
+
+The apiary page is [here](http://docs.tidepooluserapi.apiary.io/).
+
+# Group User
+User related resources of the **User API**
+
+## Status [/status]
+### Retrieve status information [GET]
+Returns a status health check with a list of status of its dependencies. 
+If the server is operating properly and all dependencies are up and 
+running, returns 200, otherwise 500. In either case, the body contains a 
+list of up and down dependencies.
+
+
++ Response 200
+
+        {
+            "up" : [ "mongo" ],
+            "down" : []
+        }
+    
++ Response 500
+
+        If the server is *not* operating properly and one or more dependencies
+        have failed to start or are no longer running.
+
+        {
+            "up" : [],
+            "down" : [ "mongo" ]
+        }
+
+## Testing Status [/status/{statusvalue}]
+### Retrieve status information [GET]
+Returns whatever status it was sent as a parameter
++ Parameters
+    + statusvalue (required, integer, `404`) ... The return code you want from the status call
+
++ Response 404    
+
+## Login [/login]
+### Log in an existing user [POST]
++ Request
+
+    + Headers
+    
+            X-Tidepool-UserID: blipuser
+            X-Tidepool-Password: my_1337_password
+            
+
++ Response 200 (application/json)
+
+    + Headers
+
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
+    + Body
+    
+            {
+              "userid": "ebe58036a5",
+              "username": "user@tidepool.org,
+              "emails" : [ "email1@foo.com" ]
+            }
+            
++ Response 401
+
+        When the username/password combination fails.
+
+### Refresh a session token [GET]
+
+This call takes a token, and if the token was still valid, issues
+a new (different) token; it also returns the userid in the body. This may
+be a bad idea.
+
++ Request
+
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+            
+
++ Response 200 (application/json)
+
+
+    + Headers
+
+            x-tidepool-session-token : 1324234234.adfa234.123ad34
+
+    + Body
+    
+            {
+              "userid": "123123abcd",
+            }
+
++ Response 401
+
+        When the token is invalid.
+
++ Response 404
+
+        When the token is not provided.
+
+
+## Logout [/logout]
+### Log out from an existing session [POST]
+
++ Request
+
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
++ Response 200
+
++ Response 401
+
+        When the token is invalid or not provided or has expired.
+
+
+    
+## User records [/user]
+### Retrieve current user's info [GET]
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
++ Response 200 (application/json)
+
+    + Body
+    
+            {
+              "userid": "ebe58036a5",
+              "username": "user@tidepool.org,
+              "emails" : [ "email1@foo.com" ]
+            }
+
++ Response 401
+
+        When the token is invalid or not provided.
+
+
+### Create a user [POST]
++ Request (application/json)
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
+    + Body
+    
+            {
+              "username": "user@tidepool.org",
+              "emails" : [ "email1@foo.com" ],
+              "password" : "secret"
+            }
+
++ Response 201 (application/json)
+    + Headers
+
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
+    + Body
+    
+            {
+              "userid": "ebe58036a5",
+              "username": "user@tidepool.org",
+              "emails" : [ "email1@foo.com" ]
+            }
+
++ Response 400
+
+        When the body information is invalid (usually because something
+        is not unique)
+
++ Response 401
+
+        When the token is invalid or not provided.
+
+
+
+## User info for another user [/user/{userid}]
+### Retrieve other user's info [GET]
++ Parameters
+    + userid (required, string, `123123abcd`) ... Tidepool-assigned user ID
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
++ Response 200 (application/json)
+
+    + Body
+    
+            {
+              "userid": userid,
+              "username": "otheruser@tidepool.org",
+              "emails" : [ "email2@foo.com" ]
+            }
+
++ Response 401
+
+        When the token is invalid or not provided.
+
++ Response 404
+
+        When the userid was not found.
+
+
+
+## Check token validity [/token/{usertoken}]
+### Check to see if a token is valid [GET]
+
+    The session token passed in must be a server-side token. This request is valid only for Tidepool servers.
+    The userid returned is the userid associated with the usertoken.
+
+
+
++ Parameters
+    + usertoken (required, string, `123123abcd`) ... Tidepool-assigned user token
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 44sadf87.12x3840.aasd90JKj
+
++ Response 200 (application/json)
+    + Body
+    
+            {
+              "userid": userid,
+            }
+
++ Response 401
+
+        When the session token is invalid or not provided.
+
++ Response 404
+
+        When the usertoken was not found in the token store.
+
+
+

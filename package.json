@@ -1,33 +1,40 @@
 {
-  "name": "dummy-api",
-  "version": "0.0.1",
-  "description": "Test API to validate Tidepool standards and processes.",
+  "name": "user-api",
+  "version": "0.0.3",
+  "description": "User API for handling logins and sessions",
   "main": "lib/index.js",
   "directories": {
     "lib": "./lib"
   },
   "scripts": {
     "start": "node lib/index.js",
-    "test": "make test"
+    "test": "grunt jshint test"
   },
   "repository": "https://github.com/tidepool-org/dummy-api.git",
   "author": "Tidepool",
   "license": "Tidepool",
   "dependencies": {
-    "restify": "~2.6.0",
-    "request": "~2.25.0",
+    "bunyan": "~0.22.1",
     "cookies": "~0.3.6",
-    "mocha": "~1.13.0",
-    "should": "~1.3.0",
-    "grunt-mocha-test": "~0.7.0",
-    "underscore": "~1.5.2",
-    "crypto-js": "~3.1.2-1"
+    "crypto-js": "~3.1.2-1",
+    "hakken": "0.0.7",
+    "jwt-simple": "~0.1.0",
+    "lodash": "~2.4.1",
+    "moment": "~2.4.0",
+    "mongojs": "~0.9.10",
+    "restify": "~2.6.0",
+    "request": "~2.25.0"
   },
   "devDependencies": {
+    "amdefine": "~0.1.0",
+    "chai": "~1.8.1",
     "grunt": "~0.4.1",
+    "grunt-cli": "0.1.11",
     "grunt-contrib-jshint": "~0.6.4",
     "grunt-contrib-uglify": "~0.2.4",
     "grunt-docco2": "~0.1.2",
-    "grunt-shell-spawn": "~0.2.4"
+    "grunt-mocha-test": "~0.7.0",
+    "grunt-shell-spawn": "~0.2.4",
+    "supertest": "~0.8.2"
   }
 }
