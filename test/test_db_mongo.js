@@ -192,7 +192,6 @@ describe('dbmongo:', function () {
         expect(result.detail.pi100).to.equal(314);
         expect(result.detail.object.foo).to.equal('bar');
         expect(result.detail.object.buzz).to.equal('bazz');
-        console.log(result);
         checkResult(result.detail, user2);
         done();
       });

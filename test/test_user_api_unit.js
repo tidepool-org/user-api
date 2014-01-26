@@ -448,7 +448,6 @@ describe('userapi', function () {
           .expect(200)
           .end(function (err, obj) {
             if (err) return done(err);
-            // console.log(obj.res.body);
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal(user.userid);
@@ -466,7 +465,6 @@ describe('userapi', function () {
           .expect(200)
           .end(function (err, obj) {
             if (err) return done(err);
-            // console.log(obj.res.body);
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal('Test Server');
@@ -503,7 +501,6 @@ describe('userapi', function () {
           .expect(200)
           .end(function (err, obj) {
             if (err) return done(err);
-            // console.log(obj.res.body);
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal('Test Server');
@@ -543,7 +540,6 @@ describe('userapi', function () {
           .expect(201)
           .end(function (err, obj) {
             if (err) return done(err);
-            console.log(obj.res.body);
             expect(obj.res.body.id).to.exist;
             expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
             expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
@@ -633,8 +629,6 @@ describe('userapi', function () {
           .end(function (err, obj) {
             if (err) return done(err);
             expect(obj.res.body.id).to.exist;
-            console.log(obj.res.body);
-            console.log(name1);
             expect(obj.res.body.id).to.not.equal(name1.id);
             expect(obj.res.body.hash).to.not.equal(name1.hash);
             done();
