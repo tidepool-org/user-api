@@ -244,5 +244,107 @@ be a bad idea.
 
         When the usertoken was not found in the token store.
 
+## Anonymous hash and id generate [/private{?query}]
+### Create an id/hash pair that is not stored [GET]
 
++ Parameters
+    + query (optional, string, `random=text`) ... By specifying any number of query parameters, you can include them in the hash calculation, which may help improve the quality of the hash generation.
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 44sadf87.12x3840.aasd90JKj
+
+    
++ Response 200 (application/json)
+    + Body
+    
+            {
+              "name" : "",
+              "id": "f655dd9db8",
+              "hash": "69fd718d9aa9a487e6142e21"
+            }
+
+
+## Manage the private hash and id data [/private/{userid}/{name}{?query}]
+### Generate a new hash pair under the given user and name [POST]
+
++ Parameters
+    + userid (required, string, `123123abcd`) ... Tidepool-assigned user ID
+    + name (required, string, `meta`) ... A string to identify this pair in the future
+    + query (optional, string, `random=text`) ... By specifying any number of query parameters, you can include them in the hash calculation, which may help improve the quality of the hash generation.
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 44sadf87.12x3840.aasd90JKj
+
+    
++ Response 201 (application/json)
+    + Body
+    
+            {
+              "name" : "{name}",
+              "id": "f655dd9db8",
+              "hash": "69fd718d9aa9a487e6142e21"
+            }
+
++ Response 422
+
+        When the key is already in use for this user.
+
+### Get a previously calculated hash pair [GET]
+
++ Parameters
+    + userid (required, string, `123123abcd`) ... Tidepool-assigned user ID
+    + name (required, string, `meta`) ... A string to identify this pair in the future
+    + query (optional, string, `random=text`) ... By specifying any number of query parameters, you can include them in the hash calculation, which may help improve the quality of the hash generation.
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 44sadf87.12x3840.aasd90JKj
+
+    
++ Response 200 (application/json)
+    + Body
+    
+            {
+              "name" : "{name}",
+              "id": "f655dd9db8",
+              "hash": "69fd718d9aa9a487e6142e21"
+            }
+
++ Response 404
+
+        When the key was not found for this user.
+
+### Regenerate a previously calculated hash pair [PUT]
+
++ Parameters
+    + userid (required, string, `123123abcd`) ... Tidepool-assigned user ID
+    + name (required, string, `meta`) ... A string to identify this pair in the future
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 44sadf87.12x3840.aasd90JKj
+
+    
++ Response 200 (application/json)
+    + Body
+    
+            {
+              "name" : "{name}",
+              "id": "9bf90db601",
+              "hash": "ba3258bb8e665eaa12139dca"
+            }
+
++ Response 404
+
+        When the key was not found for this user.
+
+    
+
+    
 
