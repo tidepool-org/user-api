@@ -547,6 +547,8 @@ describe('userapi', function () {
             expect(obj.res.body.id).to.exist;
             expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
             expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
+            name1.id = obj.res.body.id;
+            name1.hash = obj.res.body.hash;
             done();
           });
       });
@@ -606,8 +608,8 @@ describe('userapi', function () {
           .end(function (err, obj) {
             if (err) return done(err);
             expect(obj.res.body.id).to.exist;
-            expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
-            expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
+            expect(obj.res.body.id).to.equal(name1.id);
+            expect(obj.res.body.hash).to.equal(name1.hash);
             done();
           });
       });
@@ -623,9 +625,24 @@ describe('userapi', function () {
           });
       });
 
-      // need a PUT test
+      it('should return 200 and new values for a PUT', function (done) {
+        supertest
+          .put('/private/' + user.userid + '/' + name1.name )
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.id).to.exist;
+            console.log(obj.res.body);
+            console.log(name1);
+            expect(obj.res.body.id).to.not.equal(name1.id);
+            expect(obj.res.body.hash).to.not.equal(name1.hash);
+            done();
+          });
+      });
 
-      // skipping delete tests for now
+
+      // skipping delete tests for now since I haven't implemented delete
       it.skip('should delete a name, return 204', function (done) {
         supertest
           .del('/private/' + user.userid + '/' + name1.name )
