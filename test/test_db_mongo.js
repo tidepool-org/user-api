@@ -184,9 +184,9 @@ describe('dbmongo:', function () {
 
     it('should update a user with a new field', function (done) {
       dbmongo.updateUser(user2.userid, {
-        pi100: 314, 
-        'object.foo': 'bar', 
-        'object.buzz': 'bazz' 
+        pi100: 314,
+        'object.foo': 'bar',
+        'object.buzz': 'bazz'
       }, function (err, result) {
         shouldSucceed(err, result, 200);
         expect(result.detail.pi100).to.equal(314);
