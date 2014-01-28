@@ -65,7 +65,7 @@ module.exports = (function() {
   }
 
   // Shared secret for servers, keep it safe!
-  env.serverSecret = process.env.API_SECRET;
+  env.serverSecret = process.env.SERVER_SECRET;
   if (env.serverSecret == null) {
     throw new Error('Must specify a SERVER_SECRET in your environment.');
   }

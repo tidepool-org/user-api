@@ -451,7 +451,7 @@ describe('userapi', function () {
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal(user.userid);
-            expect(obj.res.body.server).to.equal(false);
+            expect(obj.res.body.isserver).to.equal(false);
             done();
           });
       });
@@ -468,7 +468,7 @@ describe('userapi', function () {
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal('Test Server');
-            expect(obj.res.body.server).to.equal(true);
+            expect(obj.res.body.isserver).to.equal(true);
             done();
           });
       });
@@ -504,7 +504,7 @@ describe('userapi', function () {
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal('Test Server');
-            expect(obj.res.body.server).to.equal(true);
+            expect(obj.res.body.isserver).to.equal(true);
             done();
           });
       });
