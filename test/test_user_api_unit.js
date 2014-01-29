@@ -28,13 +28,13 @@ var env = {
   _wipeTheEntireDatabase: true,
   adminKey: 'specialkey',
   saltDeploy: 'randomsaltvalue',
-  secret: 'a secret of some sort',
+  apiSecret: 'a secret of some sort',
   serverSecret: 'sharedMachineSecret',
   logger: {
     error: console.log,
     warn: console.log,
     info: console.log
-  },
+  }
 };
 
 var dbmongo = require('../lib/db_mongo.js')(env);
