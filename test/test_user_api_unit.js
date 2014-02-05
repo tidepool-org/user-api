@@ -85,20 +85,14 @@ describe('userapi', function () {
       supertest
         .get('/status?status=403')
         .expect(403)
-        .end(function (err, obj) {
-          if (err) return done(err);
-          done();
-        });
+        .end(done);
     });
 
     it('should ignore extra query parameters', function (done) {
       supertest
         .get('/status?bogus=whatever')
         .expect(200)
-        .end(function (err, obj) {
-          if (err) return done(err);
-          done();
-        });
+        .end(done);
     });
 
   });
@@ -109,10 +103,7 @@ describe('userapi', function () {
       supertest
         .get('/nonexistent')
         .expect(404)
-        .end(function (err, obj) {
-          if (err) return done(err);
-          done();
-        });
+        .end(done);
     });
 
   });
@@ -123,10 +114,7 @@ describe('userapi', function () {
       supertest
         .post('/status')
         .expect(405)
-        .end(function (err, obj) {
-          if (err) return done(err);
-          done();
-        });
+        .end(done);
     });
 
   });
@@ -138,10 +126,7 @@ describe('userapi', function () {
         .post('/user')
         .send('junk')
         .expect(400)
-        .end(function (err, obj) {
-          if (err) return done(err);
-          done();
-        });
+        .end(done);
     });
 
   });
@@ -201,10 +186,7 @@ describe('userapi', function () {
           .post('/logout')
           .set('X-Tidepool-Session-Token', sessionToken)
           .expect(200)
-          .end(function (err, res) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
     });
@@ -217,10 +199,7 @@ describe('userapi', function () {
           .set('X-Tidepool-UserID', user.username)
           .set('X-Tidepool-Password', user.password + 'x')
           .expect(401)
-          .end(function (err, obj) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
     });
 
@@ -288,10 +267,7 @@ describe('userapi', function () {
           .get('/login')
           .set('X-Tidepool-Session-Token', oldToken)
           .expect(401)
-          .end(function (err, obj) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
     });
 
@@ -302,10 +278,7 @@ describe('userapi', function () {
         supertest
           .post('/logout')
           .expect(401)
-          .end(function (err, res) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
     });
@@ -317,10 +290,7 @@ describe('userapi', function () {
           .post('/logout')
           .set('X-Tidepool-Session-Token', sessionToken)
           .expect(200)
-          .end(function (err, res) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
     });
@@ -331,10 +301,7 @@ describe('userapi', function () {
         supertest
           .get('/user/' + user.userid)
           .expect(401)
-          .end(function (err, res) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
     });
@@ -517,8 +484,11 @@ describe('userapi', function () {
           .get('/private?some=data&something=else')
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(200)
-          .end(function (err, obj) {
-            if (err) return done(err);
+          .end(
+          function (err, obj) {
+            if (err) {
+              return done(err);
+            }
             expect(obj.res.body.name).to.equal('');
             expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
             expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
@@ -528,18 +498,21 @@ describe('userapi', function () {
 
     });
 
-    describe('Exercise /private/name to retrieve and store id/hash with a name for a user', function() {
+    describe('Exercise /private/name to retrieve and store id/hash with a name for a user', function () {
 
       var name1 = {name: 'testname'};
       var name2 = {name: 'differentname'};
 
-      it('POST should return 200 with an id/hash in the response', function (done) {
+      it('GET should return 200 with an id/hash in the response', function (done) {
         supertest
-          .post('/private/' + user.userid + '/' + name1.name)
+          .get('/private/' + user.userid + '/' + name1.name)
           .set('X-Tidepool-Session-Token', serverToken)
-          .expect(201)
-          .end(function (err, obj) {
-            if (err) return done(err);
+          .expect(200)
+          .end(
+          function (err, obj) {
+            if (err) {
+              return done(err);
+            }
             expect(obj.res.body.id).to.exist;
             expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
             expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
@@ -549,15 +522,28 @@ describe('userapi', function () {
           });
       });
 
+      it('GET should return 200 with the same id/hash in the response when given the same name', function (done) {
+        supertest
+          .get('/private/' + user.userid + '/' + name1.name)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(
+          function (err, obj) {
+            if (err) {
+              return done(err);
+            }
+            expect(obj.res.body).to.have.property('id').that.equals(name1.id);
+            expect(obj.res.body).to.have.property('hash').that.equals(name1.hash);
+            done();
+          });
+      });
+
       it('should return 404 if there is no name field', function (done) {
         supertest
           .post('/private/' + user.userid)
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(404)
-          .end(function (err, obj) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
       it('should return 401 if authorization token is not a server token', function (done) {
@@ -565,30 +551,35 @@ describe('userapi', function () {
           .post('/private/' + user.userid + '/validname')
           .set('X-Tidepool-Session-Token', sessionToken)
           .expect(401)
-          .end(function (err, obj) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
-      it('should return 422 if you try to post the same name twice', function (done) {
+      it('should return 201 and a hash if you post to a name that exists', function (done) {
         supertest
           .post('/private/' + user.userid + '/' + name1.name)
           .set('X-Tidepool-Session-Token', serverToken)
-          .expect(422)
-          .end(function (err, obj) {
-            if (err) return done(err);
+          .expect(201)
+          .end(
+          function (err, obj) {
+            expect(err).to.not.exist;
+            expect(obj.res.body).to.have.property('id').that.not.equals(name1.id);
+            expect(obj.res.body).to.have.property('hash').that.not.equals(name1.hash);
+            name1.id = obj.res.body.id;
+            name1.hash = obj.res.body.hash;
             done();
           });
       });
 
       it('should accept a different name with additional salt', function (done) {
         supertest
-          .post('/private/' + user.userid + '/' + name2.name + '?extra=salt')
+          .get('/private/' + user.userid + '/' + name2.name + '?extra=salt')
           .set('X-Tidepool-Session-Token', serverToken)
-          .expect(201)
-          .end(function (err, obj) {
-            if (err) return done(err);
+          .expect(200)
+          .end(
+          function (err, obj) {
+            if (err) {
+              return done(err);
+            }
             expect(obj.res.body.id).to.exist;
             expect(obj.res.body.id).to.match(/[a-zA-Z0-9.]{8,12}/);
             expect(obj.res.body.hash).to.match(/[a-zA-Z0-9.]{20,64}/);
@@ -598,11 +589,14 @@ describe('userapi', function () {
 
       it('should fetch a name, return 200 with an id/hash', function (done) {
         supertest
-          .get('/private/' + user.userid + '/' + name1.name )
+          .get('/private/' + user.userid + '/' + name1.name)
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(200)
-          .end(function (err, obj) {
-            if (err) return done(err);
+          .end(
+          function (err, obj) {
+            if (err) {
+              return done(err);
+            }
             expect(obj.res.body.id).to.exist;
             expect(obj.res.body.id).to.equal(name1.id);
             expect(obj.res.body.hash).to.equal(name1.hash);
@@ -610,27 +604,21 @@ describe('userapi', function () {
           });
       });
 
-      it('should return 404 if the name does not exist', function (done) {
-        supertest
-          .get('/private' + user.userid + '/junkname')
-          .set('X-Tidepool-Session-Token', serverToken)
-          .expect(404)
-          .end(function (err, obj) {
-            if (err) return done(err);
-            done();
-          });
-      });
-
       it('should return 200 and new values for a PUT', function (done) {
         supertest
-          .put('/private/' + user.userid + '/' + name1.name )
+          .put('/private/' + user.userid + '/' + name1.name)
           .set('X-Tidepool-Session-Token', serverToken)
-          .expect(200)
-          .end(function (err, obj) {
-            if (err) return done(err);
+          .expect(201)
+          .end(
+          function (err, obj) {
+            if (err) {
+              return done(err);
+            }
             expect(obj.res.body.id).to.exist;
             expect(obj.res.body.id).to.not.equal(name1.id);
             expect(obj.res.body.hash).to.not.equal(name1.hash);
+            name1.id = obj.res.body.id;
+            name1.hash = obj.res.body.hash;
             done();
           });
       });
@@ -639,35 +627,36 @@ describe('userapi', function () {
       // skipping delete tests for now since I haven't implemented delete
       it.skip('should delete a name, return 204', function (done) {
         supertest
-          .del('/private/' + user.userid + '/' + name1.name )
+          .del('/private/' + user.userid + '/' + name1.name)
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(200)
-          .end(function (err, obj) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
-      it.skip('should return 404 because the name no longer exists', function (done) {
+      it.skip('should return a new key/pair because the name no longer exists', function (done) {
         supertest
           .get('/private/' + user.userid + '/' + name1.name)
           .set('X-Tidepool-Session-Token', serverToken)
-          .expect(404)
-          .end(function (err, obj) {
-            if (err) return done(err);
+          .expect(200)
+          .end(
+          function (err, obj) {
+            if (err) {
+              return done(err);
+            }
+            expect(obj.res.body).to.have.property('id').that.not.equals(name1.id);
+            expect(obj.res.body).to.have.property('hash').that.not.equals(name1.hash);
+            name1.id = obj.res.body.id;
+            name1.hash = obj.res.body.hash;
             done();
           });
       });
 
       it.skip('should delete the other name, return 204', function (done) {
         supertest
-          .delete('/private/' + name2.name )
+          .delete('/private/' + name2.name)
           .set('X-Tidepool-Session-Token', serverToken)
-          .expect(200)
-          .end(function (err, obj) {
-            if (err) return done(err);
-            done();
-          });
+          .expect(204)
+          .end(done);
       });
 
 
@@ -680,10 +669,7 @@ describe('userapi', function () {
           .post('/logout')
           .set('X-Tidepool-Session-Token', sessionToken)
           .expect(200)
-          .end(function (err, res) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
     });
@@ -695,10 +681,7 @@ describe('userapi', function () {
           .post('/logout')
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(200)
-          .end(function (err, res) {
-            if (err) return done(err);
-            done();
-          });
+          .end(done);
       });
 
     });
