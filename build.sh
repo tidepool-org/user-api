@@ -3,6 +3,7 @@
 rm -rf node_modules
 npm install .
 
+
 BUILD_DIR=build
 
 function cleanup {
@@ -22,6 +23,6 @@ sleep 3
 echo "Running tests"
 trap "cleanup ${MONGO_PID}" EXIT
 
-./node_modules/.bin/grunt test
+./node_modules/.bin/grunt jshint test
 
 
