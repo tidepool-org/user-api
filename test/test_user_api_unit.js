@@ -136,8 +136,7 @@ describe('userapi', function () {
     it('should respond with 401', function (done) {
       supertest
         .post('/login')
-        .set('X-Tidepool-UserID', 'badid')
-        .set('X-Tidepool-Password', 'abcdef1234567890')
+        .auth('badid', 'abcdef1234567890')
         .expect(401)
         .end(function (err, res) {
           if (err) return done(err);
@@ -196,8 +195,7 @@ describe('userapi', function () {
       it('should respond with 401', function (done) {
         supertest
           .post('/login')
-          .set('X-Tidepool-UserID', user.username)
-          .set('X-Tidepool-Password', user.password + 'x')
+          .auth(user.username, user.password + 'x')
           .expect(401)
           .end(done);
       });
@@ -208,8 +206,7 @@ describe('userapi', function () {
       it('should respond with 200 and a session token', function (done) {
         supertest
           .post('/login')
-          .set('X-Tidepool-UserID', user.username)
-          .set('X-Tidepool-Password', user.password)
+          .auth(user.username, user.password)
           .expect(200)
           .end(function (err, obj) {
             if (err) return done(err);
