@@ -23,7 +23,8 @@
     "moment": "2.4.0",
     "mongojs": "0.9.10",
     "restify": "2.6.0",
-    "request": "2.25.0"
+    "request": "2.25.0",
+    "emailjs": "~0.3.6"
   },
   "devDependencies": {
     "amdefine": "0.1.0",

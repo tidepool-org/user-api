@@ -93,5 +93,13 @@ module.exports = (function() {
     }
   }
 
+  env.email_sender = process.env.EMAIL_SENDER;
+  env.email_password = process.env.EMAIL_PASSWORD;
+  env.email_host = process.env.EMAIL_HOST;
+
+  if (env.email_sender == null || env.email_password == null || env.email_host == null) {
+    throw new Error('Must specify all of EMAIL_SENDER, EMAIL_PASSWORD, and EMAIL_HOST in your environment.');
+  }
+  
   return env;
 })();

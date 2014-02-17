@@ -178,6 +178,28 @@ describe('userapi', function () {
       });
     });
 
+    it('should send an email', function(done) {
+      supertest
+        .get('/sendemail')
+        .expect(201)
+        .end(function (err, obj) {
+          if (err) return done(err);
+          expect(err).to.not.exist;
+          done();
+        });
+    });
+
+    it.skip('should send a recovery mail', function(done) {
+      supertest
+        .get('/passwordrecovery/' + user.username)
+        .expect(201)
+        .end(function (err, obj) {
+          if (err) return done(err);
+          expect(err).to.not.exist;
+          done();
+        });
+    });
+
     describe('POST /logout with valid session token #1', function () {
 
       it('should respond with 200 and log out', function (done) {
