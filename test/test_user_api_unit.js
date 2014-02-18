@@ -361,7 +361,7 @@ describe('userapi', function () {
       });
     });
 
-    describe('DELETE /user without a password should fail', function () {
+    describe('DELETE /user without a password', function () {
 
       it('should respond with 403', function (done) {
         supertest
@@ -372,26 +372,26 @@ describe('userapi', function () {
       });
     });
 
-    describe('DELETE /user with bad password should fail', function () {
+    describe('DELETE /user with bad password', function () {
 
-      it('should respond with 403', function (done) {
+      it('should respond with 400', function (done) {
         supertest
           .del('/user')
           .set('X-Tidepool-Session-Token', sessionToken)
           .send({password: 'wrong'})
-          .expect(403)
+          .expect(400)
           .end(done);
       });
     });
 
-    describe('DELETE /user to get rid of a user', function () {
+    describe('DELETE /user to get rid of the current user', function () {
 
-      it('should respond with 203', function (done) {
+      it('should respond with 200', function (done) {
         supertest
           .del('/user')
           .set('X-Tidepool-Session-Token', sessionToken)
           .send({password: user.password})
-          .expect(203)
+          .expect(200)
           .end(done);
       });
     });
