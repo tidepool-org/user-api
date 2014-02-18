@@ -147,6 +147,18 @@ describe('userapi', function () {
 
   });
 
+  describe('GET /login with null token', function () {
+    var tok = null;
+    console.log('token:', tok);
+    it('should return 401', function (done) {
+      supertest
+        .get('/login')
+        .set('X-Tidepool-Session-Token', tok)
+        .expect(401)
+        .end(done);
+    });
+  });
+
   describe('Create and manage a user', function () {
     var user = {
       username: 'realname',
@@ -318,6 +330,82 @@ describe('userapi', function () {
     });
 
 
+  });
+
+  describe('Create and delete a user:', function () {
+    var user = {
+      username: 'somename',
+      emails: ['bar@bar.com'],
+      password: 'R6LvqLQ$=aTBgfj&4jqAq'
+    };
+    var sessionToken = null;
+
+    describe('POST /user to log in', function () {
+
+      it('should respond with 201', function (done) {
+        supertest
+          .post('/user')
+          .send(user)
+          .expect(201)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.username).to.equal(user.username);
+            expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
+            user.userid = obj.res.body.userid;
+            expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            sessionToken = obj.res.headers['x-tidepool-session-token'];
+            done();
+          });
+      });
+    });
+
+    describe('DELETE /user without a password should fail', function () {
+
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user with bad password should fail', function () {
+
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .send({password: 'wrong'})
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user to get rid of a user', function () {
+
+      it('should respond with 203', function (done) {
+        supertest
+          .del('/user')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .send({password: user.password})
+          .expect(203)
+          .end(done);
+      });
+    });
+
+    describe('Delete logs you out, so GET /login with that token', function () {
+
+      it('should return 401', function (done) {
+        supertest
+          .get('/login')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(401)
+          .end(done);
+      });
+    });
   });
 
 
