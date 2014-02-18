@@ -149,7 +149,6 @@ describe('userapi', function () {
 
   describe('GET /login with null token', function () {
     var tok = null;
-    console.log('token:', tok);
     it('should return 401', function (done) {
       supertest
         .get('/login')
@@ -458,7 +457,7 @@ describe('userapi', function () {
       });
     });
 
-    describe('GET /user/:id while logged in', function () {
+    describe('GET /user/:id as a server', function () {
 
       it('should respond with 200 and user info', function (done) {
         supertest
@@ -709,7 +708,7 @@ describe('userapi', function () {
       });
 
 
-      // skipping delete tests for now since I haven't implemented delete
+      // skipping private delete tests for now since I haven't implemented delete
       it.skip('should delete a name, return 204', function (done) {
         supertest
           .del('/private/' + user.userid + '/' + name1.name)
@@ -758,6 +757,39 @@ describe('userapi', function () {
       });
 
     });
+
+    describe('DELETE /user/:id for server without password', function () {
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user/' + user.userid)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user/:id for server with bad userid', function () {
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user/' + 'a123af')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user/:id for server with password', function () {
+      it('should respond with 200', function (done) {
+        supertest
+          .del('/user/' + user.userid)
+          .send({password: user.password})
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(done);
+      });
+    });
+
+
 
     describe('POST /logout with valid server token', function () {
 

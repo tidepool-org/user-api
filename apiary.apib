@@ -232,6 +232,28 @@ be a bad idea.
 
 
 
+### Delete arbitrary user [GET]
++ Parameters
+    + userid (required, string, `123123abcd`) ... Tidepool-assigned user ID
+
++ Request
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
+
+    + Body
+    
+            {
+              "password" : "secret"
+            }
+
++ Response 200 (application/json)
+
++ Response 401
+
++ Response 403
+
+
 ## Check token validity [/token/{usertoken}]
 ### Check to see if a token is valid [GET]
 
