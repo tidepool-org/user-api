@@ -396,7 +396,7 @@ describe('userapi', function () {
       });
     });
 
-    describe('Delete logs you out, so GET /login with that token', function () {
+    describe('Delete logs users out, so GET /login with that token', function () {
 
       it('should return 401', function (done) {
         supertest

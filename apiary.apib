@@ -182,8 +182,27 @@ be a bad idea.
         When the token is invalid or not provided.
 
 
+### Delete a user [DELETE]
++ Request (application/json)
+    + Headers
+    
+            x-tidepool-session-token : 23sadf87.123840.aasd90JKj
 
-## User info for another user [/user/{userid}]
+    + Body
+    
+            {
+              "password" : "secret"
+            }
+
++ Response 200
+
++ Response 400
+
++ Response 401
+
+
+
+## User info for arbitrary user [/user/{userid}]
 ### Retrieve other user's info [GET]
 + Parameters
     + userid (required, string, `123123abcd`) ... Tidepool-assigned user ID
