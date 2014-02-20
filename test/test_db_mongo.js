@@ -93,7 +93,7 @@ describe('dbmongo:', function () {
     };
     var user2 = {
       username: 'McTesty',
-      emails: ['mctesty@tester.com'],
+      emails: ['mctesty@tester.com', 'secret@email.com'],
       password: 'test'
     };
 
@@ -107,7 +107,7 @@ describe('dbmongo:', function () {
 
       if (ref.userid) expect(user.userid).to.equal(ref.userid);
 
-      expect(user.emails.length).to.equal(1);
+      expect(user.emails.length).to.equal(ref.emails.length);
       expect(user.emails[0]).to.equal(ref.emails[0]);
       expect(user.userid.length).to.equal(10);
     };
@@ -133,6 +133,32 @@ describe('dbmongo:', function () {
 
     it('should fail trying to recreate existing user', function (done) {
       dbmongo.addUser(user1, function (err, result) {
+        shouldFail(err, result, 400);
+        done();
+      });
+    });
+
+    it('should fail trying to create a new user with existing email addr', function (done) {
+      var user_sameemail = {
+        username: 'Testy2',
+        emails: ['mctesty@mctester.com'],
+        password: 'test2'
+      };
+
+      dbmongo.addUser(user_sameemail, function (err, result) {
+        shouldFail(err, result, 400);
+        done();
+      });
+    });
+
+    it('should fail trying to create a new user with existing username but different email', function (done) {
+      var user_sameemail = {
+        username: 'Testy',
+        emails: ['mctesty2@mctester.com'],
+        password: 'test2'
+      };
+
+      dbmongo.addUser(user_sameemail, function (err, result) {
         shouldFail(err, result, 400);
         done();
       });
@@ -170,6 +196,17 @@ describe('dbmongo:', function () {
       });
     });
 
+    it('should find a user by alternate email', function (done) {
+      dbmongo.getUser({
+        user: user2.emails[0]
+      }, function (err, result) {
+        shouldSucceed(err, result, 200);
+        expect(result.detail.length).to.equal(1);
+        checkResult(result.detail[0], user2);
+        done();
+      });
+    });
+
     it('should find a user by email with a correct password', function (done) {
       dbmongo.getUser({
         user: user2.emails[0],
@@ -193,6 +230,62 @@ describe('dbmongo:', function () {
         expect(result.detail.object.foo).to.equal('bar');
         expect(result.detail.object.buzz).to.equal('bazz');
         checkResult(result.detail, user2);
+        done();
+      });
+    });
+
+    it('should fail to update a user if the new email already exists in the database', function (done) {
+      dbmongo.updateUser(user2.userid, {
+        emails: [ user1.emails[0] ]
+      }, function (err, result) {
+        shouldFail(err, result, 400);
+        done();
+      });
+    });
+
+    it('should update a user to add a new email address', function (done) {
+      dbmongo.updateUser(user2.userid, {
+        emails: [ user2.emails[0], 'newemail@user.com' ]
+      }, function (err, result) {
+        shouldSucceed(err, result, 200);
+        expect(result.detail.emails[1]).to.equal('newemail@user.com');
+        done();
+      });
+    });
+
+    it('should not allow you to erase all emails', function (done) {
+      dbmongo.updateUser(user2.userid, {
+        emails: []
+      }, function (err, result) {
+        shouldFail(err, result, 400);
+        done();
+      });
+    });
+
+    it('should not allow you to set an empty username', function (done) {
+      dbmongo.updateUser(user2.userid, {
+        username: ''
+      }, function (err, result) {
+        shouldFail(err, result, 400);
+        done();
+      });
+    });
+
+    it('should fail to update a user if the new username already exists in the database', function (done) {
+      dbmongo.updateUser(user2.userid, {
+        username: user1.username
+      }, function (err, result) {
+        shouldFail(err, result, 400);
+        done();
+      });
+    });
+
+    it('should fail to update a user if you attempt to change the userid, even if the username is valid', function (done) {
+      dbmongo.updateUser(user2.userid, {
+        userid: '234aaf345',
+        username: [ 'newusername' ],
+      }, function (err, result) {
+        shouldFail(err, result, 400);
         done();
       });
     });
