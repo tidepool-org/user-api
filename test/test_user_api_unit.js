@@ -147,6 +147,17 @@ describe('userapi', function () {
 
   });
 
+  describe('GET /login with null token', function () {
+    var tok = null;
+    it('should return 401', function (done) {
+      supertest
+        .get('/login')
+        .set('X-Tidepool-Session-Token', tok)
+        .expect(401)
+        .end(done);
+    });
+  });
+
   describe('Create and manage a user', function () {
     var user = {
       username: 'realname',
@@ -320,6 +331,82 @@ describe('userapi', function () {
 
   });
 
+  describe('Create and delete a user:', function () {
+    var user = {
+      username: 'somename',
+      emails: ['bar@bar.com'],
+      password: 'R6LvqLQ$=aTBgfj&4jqAq'
+    };
+    var sessionToken = null;
+
+    describe('POST /user to log in', function () {
+
+      it('should respond with 201', function (done) {
+        supertest
+          .post('/user')
+          .send(user)
+          .expect(201)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.username).to.equal(user.username);
+            expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
+            user.userid = obj.res.body.userid;
+            expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            sessionToken = obj.res.headers['x-tidepool-session-token'];
+            done();
+          });
+      });
+    });
+
+    describe('DELETE /user without a password', function () {
+
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user with bad password', function () {
+
+      it('should respond with 400', function (done) {
+        supertest
+          .del('/user')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .send({password: 'wrong'})
+          .expect(400)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user to get rid of the current user', function () {
+
+      it('should respond with 200', function (done) {
+        supertest
+          .del('/user')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .send({password: user.password})
+          .expect(200)
+          .end(done);
+      });
+    });
+
+    describe('Delete logs users out, so GET /login with that token', function () {
+
+      it('should return 401', function (done) {
+        supertest
+          .get('/login')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(401)
+          .end(done);
+      });
+    });
+  });
+
 
   describe('Create and manage a user as a machine', function () {
     var user = {
@@ -370,7 +457,7 @@ describe('userapi', function () {
       });
     });
 
-    describe('GET /user/:id while logged in', function () {
+    describe('GET /user/:id as a server', function () {
 
       it('should respond with 200 and user info', function (done) {
         supertest
@@ -621,7 +708,7 @@ describe('userapi', function () {
       });
 
 
-      // skipping delete tests for now since I haven't implemented delete
+      // skipping private delete tests for now since I haven't implemented delete
       it.skip('should delete a name, return 204', function (done) {
         supertest
           .del('/private/' + user.userid + '/' + name1.name)
@@ -670,6 +757,39 @@ describe('userapi', function () {
       });
 
     });
+
+    describe('DELETE /user/:id for server without password', function () {
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user/' + user.userid)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user/:id for server with bad userid', function () {
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user/' + 'a123af')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user/:id for server with password', function () {
+      it('should respond with 200', function (done) {
+        supertest
+          .del('/user/' + user.userid)
+          .send({password: user.password})
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(done);
+      });
+    });
+
+
 
     describe('POST /logout with valid server token', function () {
 
