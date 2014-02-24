@@ -835,4 +835,20 @@ describe('userapi', function () {
     });
 
   });
+
+  describe('GET /test/throttle', function () {
+
+    it('should respond with 200', function (done) {
+      supertest.get('/test/throttle').expect(200).end(done);
+    });
+    it('should respond with 200', function (done) {
+      supertest.get('/test/throttle').expect(200).end(done);
+    });
+    it('should respond with 200', function (done) {
+      supertest.get('/test/throttle').expect(200).end(done);
+    });
+    it('should respond with 429', function (done) {
+      supertest.get('/test/throttle').expect(429).end(done);
+    });
+  });
 });
