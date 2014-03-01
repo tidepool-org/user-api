@@ -14,6 +14,7 @@
   "author": "Tidepool",
   "license": "Tidepool",
   "dependencies": {
+    "amdefine": "0.1.0",
     "bunyan": "0.22.1",
     "cookies": "0.3.6",
     "crypto-js": "3.1.2-1",
@@ -26,7 +27,6 @@
     "request": "2.25.0"
   },
   "devDependencies": {
-    "amdefine": "0.1.0",
     "chai": "1.8.1",
     "grunt": "0.4.1",
     "grunt-cli": "0.1.11",
