@@ -248,6 +248,40 @@ describe('userapi', function () {
       });
     });
 
+    describe('GET /user/:myuserid while logged in', function () {
+
+      it('should respond with 200 and user info', function (done) {
+        supertest
+          .get('/user/' + user.userid)
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.username).to.exist;
+            expect(obj.res.body.username).to.equal(user.username);
+            expect(obj.res.body.emails).to.exist;
+            expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.equal(user.userid);
+            done();
+          });
+      });
+    });
+
+    describe('GET /user/:email while logged in', function () {
+
+      it('should respond with 204', function (done) {
+        supertest
+          .get('/user/' + user.emails[0])
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(204)
+          .end(function (err, obj) {
+            done();
+          });
+      });
+    });
+
+
     describe('GET /login for logged in user', function () {
 
       it('should return 200 with a new token and the user ID', function (done) {
@@ -462,6 +496,26 @@ describe('userapi', function () {
       it('should respond with 200 and user info', function (done) {
         supertest
           .get('/user/' + user.userid)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.username).to.exist;
+            expect(obj.res.body.username).to.equal(user.username);
+            expect(obj.res.body.emails).to.exist;
+            expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.equal(user.userid);
+            done();
+          });
+      });
+    });
+
+    describe('GET /user/:email as a server', function () {
+
+      it('should respond with 200 and user info', function (done) {
+        supertest
+          .get('/user/' + user.emails[0])
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(200)
           .end(function (err, obj) {
