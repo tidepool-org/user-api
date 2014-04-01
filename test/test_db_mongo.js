@@ -253,6 +253,30 @@ describe('dbmongo:', function () {
       });
     });
 
+    it('should update a user to change a password', function (done) {
+      var newpw = 'coolPassword, Dude';
+      dbmongo.updateUser(user2.userid, {
+        password: newpw
+      }, function (err, result) {
+        shouldSucceed(err, result, 200);
+        expect(result.detail.emails[1]).to.equal('newemail@user.com');
+        user2.password = newpw;
+        done();
+      });
+    });
+
+    it('should find a user by email with the new password', function (done) {
+      dbmongo.getUser({
+        user: user2.emails[0],
+        password: user2.password
+      }, function (err, result) {
+        shouldSucceed(err, result, 200);
+        expect(result.detail.length).to.equal(1);
+        checkResult(result.detail[0], user2);
+        done();
+      });
+    });
+
     it('should not allow you to erase all emails', function (done) {
       dbmongo.updateUser(user2.userid, {
         emails: []
