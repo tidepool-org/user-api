@@ -531,6 +531,44 @@ describe('userapi', function () {
       });
     });
 
+    describe('PUT /user/:userid to update an account', function () {
+      var newpw = "bluebayou";
+      it('should respond with 200 and user info', function (done) {
+        supertest
+          .put('/user/' + user.userid)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .send({updates: {password: newpw}})
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            console.log(obj.res.body);
+            expect(obj.res.body.detail.username).to.exist;
+            expect(obj.res.body.detail.username).to.equal(user.username);
+            expect(obj.res.body.detail.emails).to.exist;
+            expect(obj.res.body.detail.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.detail.userid).to.exist;
+            expect(obj.res.body.detail.userid).to.equal(user.userid);
+            user.password = newpw;
+            done();
+          });
+      });
+    });
+
+    describe('POST /login with good PW to log in to that user', function () {
+
+      it('should respond with 200 and a session token', function (done) {
+        supertest
+          .post('/login')
+          .auth(user.username, user.password)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            done();
+          });
+      });
+    });
+
     describe('GET /token/:token without a valid serverToken', function () {
       it('should respond with 401', function (done) {
         supertest
