@@ -532,7 +532,7 @@ describe('userapi', function () {
     });
 
     describe('PUT /user/:userid to update an account', function () {
-      var newpw = "bluebayou";
+      var newpw = 'bluebayou';
       it('should respond with 200 and user info', function (done) {
         supertest
           .put('/user/' + user.userid)
