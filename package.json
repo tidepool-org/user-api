@@ -1,6 +1,6 @@
 {
   "name": "user-api",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "User API for handling logins and sessions",
   "main": "lib/index.js",
   "directories": {
@@ -15,15 +15,14 @@
   "license": "Tidepool",
   "dependencies": {
     "bunyan": "0.22.1",
-    "cookies": "0.3.6",
-    "crypto-js": "3.1.2-1",
-    "hakken": "0.1.0",
+    "crypto-js": "3.1.2-3",
+    "hakken": "0.1.4",
     "jwt-simple": "0.1.0",
     "lodash": "2.4.1",
-    "moment": "2.4.0",
+    "moment": "2.5.1",
     "mongojs": "0.9.10",
     "restify": "2.6.0",
-    "request": "2.25.0"
+    "request": "2.34.0"
   },
   "devDependencies": {
     "amdefine": "0.1.0",
@@ -35,7 +34,7 @@
     "grunt-docco2": "0.1.2",
     "grunt-mocha-test": "0.7.0",
     "grunt-shell-spawn": "0.2.4",
-    "jshint": "2.4.3",
+    "jshint": "2.4.4",
     "supertest": "0.8.2"
   }
 }
