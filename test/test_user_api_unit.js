@@ -228,7 +228,7 @@ describe('userapi', function () {
       });
     });
 
-    describe('GET /user while logged in', function () {
+    describe('GET /user while logged in with update', function () {
 
       it('should respond with 200 and user info', function (done) {
         supertest
@@ -243,6 +243,29 @@ describe('userapi', function () {
             expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal(user.userid);
+            done();
+          });
+      });
+    });
+
+    describe('PUT /user while logged in', function () {
+
+      it('should respond with 200 and user info', function (done) {
+        var newname = 'myalias';
+        supertest
+          .put('/user')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .send({updates: {username: newname}})
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.username).to.exist;
+            expect(obj.res.body.username).to.equal(newname);
+            expect(obj.res.body.emails).to.exist;
+            expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.equal(user.userid);
+            user.username = newname;
             done();
           });
       });
@@ -541,12 +564,12 @@ describe('userapi', function () {
           .expect(200)
           .end(function (err, obj) {
             if (err) return done(err);
-            expect(obj.res.body.detail.username).to.exist;
-            expect(obj.res.body.detail.username).to.equal(user.username);
-            expect(obj.res.body.detail.emails).to.exist;
-            expect(obj.res.body.detail.emails[0]).to.equal(user.emails[0]);
-            expect(obj.res.body.detail.userid).to.exist;
-            expect(obj.res.body.detail.userid).to.equal(user.userid);
+            expect(obj.res.body.username).to.exist;
+            expect(obj.res.body.username).to.equal(user.username);
+            expect(obj.res.body.emails).to.exist;
+            expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.equal(user.userid);
             user.password = newpw;
             done();
           });
