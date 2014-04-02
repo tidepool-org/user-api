@@ -541,7 +541,6 @@ describe('userapi', function () {
           .expect(200)
           .end(function (err, obj) {
             if (err) return done(err);
-            console.log(obj.res.body);
             expect(obj.res.body.detail.username).to.exist;
             expect(obj.res.body.detail.username).to.equal(user.username);
             expect(obj.res.body.detail.emails).to.exist;
