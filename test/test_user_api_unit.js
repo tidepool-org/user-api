@@ -228,7 +228,7 @@ describe('userapi', function () {
       });
     });
 
-    describe('GET /user while logged in', function () {
+    describe('GET /user while logged in with update', function () {
 
       it('should respond with 200 and user info', function (done) {
         supertest
@@ -243,6 +243,29 @@ describe('userapi', function () {
             expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal(user.userid);
+            done();
+          });
+      });
+    });
+
+    describe('PUT /user while logged in', function () {
+
+      it('should respond with 200 and user info', function (done) {
+        var newname = 'myalias';
+        supertest
+          .put('/user')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .send({updates: {username: newname}})
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.username).to.exist;
+            expect(obj.res.body.username).to.equal(newname);
+            expect(obj.res.body.emails).to.exist;
+            expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.equal(user.userid);
+            user.username = newname;
             done();
           });
       });
@@ -526,6 +549,43 @@ describe('userapi', function () {
             expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
             expect(obj.res.body.userid).to.exist;
             expect(obj.res.body.userid).to.equal(user.userid);
+            done();
+          });
+      });
+    });
+
+    describe('PUT /user/:userid to update an account', function () {
+      var newpw = 'bluebayou';
+      it('should respond with 200 and user info', function (done) {
+        supertest
+          .put('/user/' + user.userid)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .send({updates: {password: newpw}})
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.username).to.exist;
+            expect(obj.res.body.username).to.equal(user.username);
+            expect(obj.res.body.emails).to.exist;
+            expect(obj.res.body.emails[0]).to.equal(user.emails[0]);
+            expect(obj.res.body.userid).to.exist;
+            expect(obj.res.body.userid).to.equal(user.userid);
+            user.password = newpw;
+            done();
+          });
+      });
+    });
+
+    describe('POST /login with good PW to log in to that user', function () {
+
+      it('should respond with 200 and a session token', function (done) {
+        supertest
+          .post('/login')
+          .auth(user.username, user.password)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
             done();
           });
       });
