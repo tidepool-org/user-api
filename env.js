@@ -16,7 +16,10 @@
 // not, you can obtain one from Tidepool Project at tidepool.org.
 // == BSD2 LICENSE ==
 
+'use strict';
+
 var fs = require('fs');
+var config = require('amoeba').config;
 
 function maybeReplaceWithContentsOfFile(obj, field)
 {
@@ -26,18 +29,23 @@ function maybeReplaceWithContentsOfFile(obj, field)
   }
 }
 
-'use strict';
 module.exports = (function() {
   var env = {};
 
+  env.metrics = {
+    // The config object to discover highwater (the metrics API).  
+    // This is just passed through to hakken.watchFromConfig()
+    serviceSpec: JSON.parse(config.fromEnvironment('METRICS_SERVICE'))
+  };
+
   // The port to attach an HTTP listener, if null, no HTTP listener will be attached
-  env.httpPort = process.env.PORT || null;
+  env.httpPort = config.fromEnvironment('PORT', null);
 
   // The port to attach an HTTPS listener, if null, no HTTPS listener will be attached
-  env.httpsPort = process.env.HTTPS_PORT || null;
+  env.httpsPort = config.fromEnvironment('HTTPS_PORT', null);
 
   // The https config to pass along to https.createServer.
-  var theConfig = process.env.HTTPS_CONFIG || null;
+  var theConfig = config.fromEnvironment('HTTPS_CONFIG', null);
   env.httpsConfig = null;
   if (theConfig != null) {
     env.httpsConfig = JSON.parse(theConfig);
@@ -53,45 +61,40 @@ module.exports = (function() {
     throw new Error('Must specify either PORT or HTTPS_PORT in your environment.');
   }
 
-  env.mongoConnectionString = process.env.MONGO_CONNECTION_STRING || 'mongodb://localhost/user';
-  env.userAdminKey = process.env.ADMIN_KEY || ''; // if the admin key isn't specified, disable admin mode.
-  env.logName = process.env.LOG_NAME || 'userapi';
+  env.mongoConnectionString = config.fromEnvironment('MONGO_CONNECTION_STRING', 'mongodb://localhost/user');
+  env.userAdminKey = config.fromEnvironment('ADMIN_KEY', ''); // if the admin key isn't specified, disable admin mode.
+  env.logName = config.fromEnvironment('LOG_NAME', 'userapi');
 
 
   // Encryption secret, keep it safe!
-  env.apiSecret = process.env.API_SECRET;
+  env.apiSecret = config.fromEnvironment('API_SECRET');
   if (env.apiSecret == null) {
     throw new Error('Must specify an API_SECRET in your environment.');
   }
 
   // Shared secret for servers, keep it safe!
-  env.serverSecret = process.env.SERVER_SECRET;
+  env.serverSecret = config.fromEnvironment('SERVER_SECRET');
   if (env.serverSecret == null) {
     throw new Error('Must specify a SERVER_SECRET in your environment.');
   }
 
   // Configurable salt for password encryption
-  env.saltDeploy = process.env.SALT_DEPLOY;
+  env.saltDeploy = config.fromEnvironment('SALT_DEPLOY');
   if (env.saltDeploy == null) {
     throw new Error('Must specify SALT_DEPLOY in your environment.');
   }
 
   // The host to contact for discovery
-  if (process.env.DISCOVERY_HOST != null) {
-    env.discovery = {};
-    env.discovery.host = process.env.DISCOVERY_HOST;
+  env.discovery = {
+    // The host to connect to for discovery
+    host: config.fromEnvironment('DISCOVERY_HOST')
+  };
 
-    env.serviceName = process.env.SERVICE_NAME;
-    if (env.serviceName == null) {
-      throw new Error('Environment variable SERVICE_NAME must be set if DISCOVERY_HOST is set.');
-    }
+  // The service name to publish on discovery
+  env.serviceName = config.fromEnvironment('SERVICE_NAME');
 
-    // The local host to expose to discovery
-    env.publishHost = process.env.PUBLISH_HOST;
-    if (env.publishHost == null) {
-      throw new Error('Environment variable PUBLISH_HOST must be set if DISCOVERY_HOST is set.');
-    }
-  }
+  // The local host to publish to discovery
+  env.publishHost = config.fromEnvironment('PUBLISH_HOST');
 
   return env;
 })();
