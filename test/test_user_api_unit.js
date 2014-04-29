@@ -19,6 +19,10 @@ var expect = require('chai').expect;
 // expect violates this jshint thing a lot, so we just suppress it
 /* jshint expr: true */
 
+var lastlog = '';
+var savelog = function () {
+  lastlog = arguments;
+};
 
 // in the test module, because require returns the same result for the same request,
 // we can override bits of the environment for the userapi
@@ -30,10 +34,11 @@ var env = {
   saltDeploy: 'randomsaltvalue',
   apiSecret: 'a secret of some sort',
   serverSecret: 'sharedMachineSecret',
+  longtermkey: 'thelongtermkey',
   logger: {
-    error: console.log,
-    warn: console.log,
-    info: console.log
+    error: savelog,
+    warn: savelog,
+    info: savelog
   }
 };
 
@@ -183,6 +188,7 @@ describe('userapi', function () {
             expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
             user.userid = obj.res.body.userid;
             expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            expect(lastlog[1]).to.equal(3600);
             sessionToken = obj.res.headers['x-tidepool-session-token'];
             done();
           });
@@ -222,6 +228,7 @@ describe('userapi', function () {
           .end(function (err, obj) {
             if (err) return done(err);
             expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            expect(lastlog[1]).to.equal(3600);
             sessionToken = obj.res.headers['x-tidepool-session-token'];
             done();
           });
@@ -317,6 +324,7 @@ describe('userapi', function () {
             expect(obj.res.body.userid).to.equal(user.userid);
             expect(obj.res.headers['x-tidepool-session-token']).to.exist;
             expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(sessionToken);
+            expect(lastlog[1]).to.equal(3600);
             oldToken = sessionToken;
             sessionToken = obj.res.headers['x-tidepool-session-token'];
             done();
@@ -356,6 +364,58 @@ describe('userapi', function () {
           .set('X-Tidepool-Session-Token', sessionToken)
           .expect(200)
           .end(done);
+      });
+
+    });
+
+    describe('POST /login with good PW and bad longterm key', function () {
+
+      it('should respond with 200 and a shortterm session token', function (done) {
+        supertest
+          .post('/login/badkey')
+          .auth(user.username, user.password)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            expect(lastlog[1]).to.equal(3600);
+            sessionToken = obj.res.headers['x-tidepool-session-token'];
+            done();
+          });
+      });
+    });
+
+    describe('POST /login with good PW and good longterm key', function () {
+
+      it('should respond with 200 and a longterm session token', function (done) {
+        supertest
+          .post('/login/' + env.longtermkey)
+          .auth(user.username, user.password)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            expect(lastlog[1]).to.equal(2592000);
+            sessionToken = obj.res.headers['x-tidepool-session-token'];
+            done();
+          });
+      });
+    });
+
+    describe('Refreshing a longterm token', function () {
+
+      it('should return 200 with the same token and the user ID', function (done) {
+        supertest
+          .get('/login')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(200)
+          .end(function (err, obj) {
+            if (err) return done(err);
+            expect(obj.res.body.userid).to.equal(user.userid);
+            expect(obj.res.headers['x-tidepool-session-token']).to.exist;
+            expect(obj.res.headers['x-tidepool-session-token']).to.equal(sessionToken);
+            done();
+          });
       });
 
     });
@@ -411,6 +471,7 @@ describe('userapi', function () {
             expect(obj.res.body.userid).to.match(/[a-f0-9]{10}/);
             user.userid = obj.res.body.userid;
             expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            expect(lastlog[1]).to.equal(3600);
             sessionToken = obj.res.headers['x-tidepool-session-token'];
             done();
           });
@@ -508,6 +569,7 @@ describe('userapi', function () {
             if (err) return done(err);
             expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
             serverToken = obj.res.headers['x-tidepool-session-token'];
+            expect(lastlog[1]).to.equal(86400);
             expect(serverToken).to.not.equal(sessionToken);
             done();
           });
@@ -586,6 +648,7 @@ describe('userapi', function () {
           .end(function (err, obj) {
             if (err) return done(err);
             expect(obj.res.headers['x-tidepool-session-token']).to.match(/[a-zA-Z0-9.]+/);
+            expect(lastlog[1]).to.equal(3600);
             done();
           });
       });
@@ -652,6 +715,7 @@ describe('userapi', function () {
             expect(obj.res.headers['x-tidepool-session-token']).to.exist;
             expect(obj.res.headers['x-tidepool-session-token']).to.not.equal(serverToken);
             serverToken = obj.res.headers['x-tidepool-session-token'];
+            expect(lastlog[1]).to.equal(86400);
             done();
           });
       });
