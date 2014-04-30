@@ -83,6 +83,11 @@ module.exports = (function() {
     throw new Error('Must specify SALT_DEPLOY in your environment.');
   }
 
+  // This is the key to use if you want to create a longterm token. 
+  // It's ok for this to be missing; if not here, then you can't 
+  // create a longerm token.
+  env.longtermkey = process.env.LONGTERM_KEY;
+
   // The host to contact for discovery
   env.discovery = {
     // The host to connect to for discovery
