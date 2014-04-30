@@ -347,10 +347,10 @@ describe('userapi', function () {
 
     describe('POST /logout without a sessionToken', function () {
 
-      it('should respond with 401', function (done) {
+      it('should respond with 200', function (done) {
         supertest
           .post('/logout')
-          .expect(401)
+          .expect(200)
           .end(done);
       });
 
