@@ -18,8 +18,7 @@
 'use strict';
 
 var fs = require('fs');
-var amoeba = require('amoeba');
-var config = amoeba.config;
+var config = require('amoeba').config;
 
 function maybeReplaceWithContentsOfFile(obj, field)
 {
@@ -31,6 +30,12 @@ function maybeReplaceWithContentsOfFile(obj, field)
 
 module.exports = (function() {
   var env = {};
+
+  env.metrics = {
+    // The config object to discover highwater (the metrics API).  
+    // This is just passed through to hakken.watchFromConfig()
+    serviceSpec: JSON.parse(config.fromEnvironment('METRICS_SERVICE'))
+  };
 
   // The port to attach an HTTP listener, if null, no HTTP listener will be attached
   env.httpPort = config.fromEnvironment('PORT', null);
@@ -66,19 +71,19 @@ module.exports = (function() {
   };
 
   // Encryption secret, keep it safe!
-  env.apiSecret = process.env.API_SECRET;
+  env.apiSecret = config.fromEnvironment('API_SECRET');
   if (env.apiSecret == null) {
     throw new Error('Must specify an API_SECRET in your environment.');
   }
 
   // Shared secret for servers, keep it safe!
-  env.serverSecret = process.env.SERVER_SECRET;
+  env.serverSecret = config.fromEnvironment('SERVER_SECRET');
   if (env.serverSecret == null) {
     throw new Error('Must specify a SERVER_SECRET in your environment.');
   }
 
   // Configurable salt for password encryption
-  env.saltDeploy = process.env.SALT_DEPLOY;
+  env.saltDeploy = config.fromEnvironment('SALT_DEPLOY');
   if (env.saltDeploy == null) {
     throw new Error('Must specify SALT_DEPLOY in your environment.');
   }
@@ -94,18 +99,11 @@ module.exports = (function() {
     host: config.fromEnvironment('DISCOVERY_HOST')
   };
 
-  if (env.discovery.host != null) {
-    env.serviceName = config.fromEnvironment('SERVICE_NAME');
-    if (env.serviceName == null) {
-      throw new Error('Environment variable SERVICE_NAME must be set if DISCOVERY_HOST is set.');
-    }
+  // The service name to publish on discovery
+  env.serviceName = config.fromEnvironment('SERVICE_NAME');
 
-    // The local host to expose to discovery
-    env.publishHost = config.fromEnvironment('PUBLISH_HOST');
-    if (env.publishHost == null) {
-      throw new Error('Environment variable PUBLISH_HOST must be set if DISCOVERY_HOST is set.');
-    }
-  }
+  // The local host to publish to discovery
+  env.publishHost = config.fromEnvironment('PUBLISH_HOST');
 
   return env;
 })();
