@@ -1,6 +1,6 @@
 {
   "name": "user-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "User API for handling logins and sessions",
   "main": "lib/index.js",
   "directories": {
@@ -23,7 +23,8 @@
     "moment": "2.5.1",
     "mongojs": "0.9.10",
     "restify": "2.6.0",
-    "request": "2.34.0"
+    "request": "2.34.0",
+    "user-api-client": "0.2.2"
   },
   "devDependencies": {
     "amdefine": "0.1.0",

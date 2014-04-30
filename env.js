@@ -15,7 +15,6 @@
 // You should have received a copy of the License along with this program; if
 // not, you can obtain one from Tidepool Project at tidepool.org.
 // == BSD2 LICENSE ==
-
 'use strict';
 
 var fs = require('fs');
@@ -65,6 +64,11 @@ module.exports = (function() {
   env.userAdminKey = config.fromEnvironment('ADMIN_KEY', ''); // if the admin key isn't specified, disable admin mode.
   env.logName = config.fromEnvironment('LOG_NAME', 'userapi');
 
+  env.metrics = {
+    // The config object to discover highwater (the metrics API).  
+    // This is just passed through to hakken.watchFromConfig()
+    serviceSpec: JSON.parse(config.fromEnvironment('METRICS_SERVICE'))
+  };
 
   // Encryption secret, keep it safe!
   env.apiSecret = config.fromEnvironment('API_SECRET');
@@ -83,6 +87,11 @@ module.exports = (function() {
   if (env.saltDeploy == null) {
     throw new Error('Must specify SALT_DEPLOY in your environment.');
   }
+
+  // This is the key to use if you want to create a longterm token. 
+  // It's ok for this to be missing; if not here, then you can't 
+  // create a longerm token.
+  env.longtermkey = process.env.LONGTERM_KEY;
 
   // The host to contact for discovery
   env.discovery = {
