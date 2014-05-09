@@ -24,7 +24,7 @@
     "mongojs": "0.9.10",
     "restify": "2.6.0",
     "request": "2.34.0",
-    "user-api-client": "0.2.2"
+    "user-api-client": "0.3.0"
   },
   "devDependencies": {
     "amdefine": "0.1.0",
