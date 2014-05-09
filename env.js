@@ -101,6 +101,8 @@ module.exports = (function() {
 
   // The service name to publish on discovery
   env.serviceName = config.fromEnvironment('SERVICE_NAME');
+  env.metricsSource = env.serviceName;
+  env.metricsVersion = require('./package.json').version;
 
   // The local host to publish to discovery
   env.publishHost = config.fromEnvironment('PUBLISH_HOST');
