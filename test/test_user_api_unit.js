@@ -903,7 +903,38 @@ describe('userapi', function () {
       });
     });
 
+    describe('User delete flag set/unset', function() {
+      it('should respond with a 401 if no session token is present', function(done) {
+        supertest
+          .post('/user/'+ user.userid + '/deleteflag')
+          .expect(401);
+      });
 
+      it('should respond with a 403 if the users password is null', function(done) {
+        supertest
+          .post('/user/' + user.userid + '/deleteflag')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(403);
+      });
+
+      it('should respond with a 200 when the flag is set', function(done) {
+        supertest
+          .post('/user/' + user.userid + '/deleteflag')
+          .send({password: user.password})
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
+          .end(done);
+      });
+
+      it('should respond with a 204 when the flag is unset', function(done) {
+        supertest
+          .put('/user/' + user.userid + '/deleteflag')
+          .send({password: user.password})
+          .set('X-Tidepool-Session-Token')
+          .expect(204)
+          .end(done);
+      });
+    });
 
     describe('POST /logout with valid server token', function () {
 
