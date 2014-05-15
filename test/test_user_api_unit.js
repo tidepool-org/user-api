@@ -907,14 +907,14 @@ describe('userapi', function () {
       it('should respond with a 401 if no session token is present', function(done) {
         supertest
           .post('/user/'+ user.userid + '/deleteflag')
-          .expect(401);
+          .expect(401, done);
       });
 
       it('should respond with a 403 if the users password is null', function(done) {
         supertest
           .post('/user/' + user.userid + '/deleteflag')
           .set('X-Tidepool-Session-Token', serverToken)
-          .expect(403);
+          .expect(403, done);
       });
 
       it('should respond with a 200 when the flag is set', function(done) {
