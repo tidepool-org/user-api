@@ -970,32 +970,59 @@ describe('userapi', function () {
     describe('User delete flag set/unset', function() {
       it('should respond with a 401 if no session token is present', function(done) {
         supertest
-          .post('/user/'+ user.userid + '/deleteflag')
+          .delete('/user/'+ user.userid + '/deleteflag')
           .expect(401, done);
       });
 
       it('should respond with a 403 if the users password is null', function(done) {
         supertest
-          .post('/user/' + user.userid + '/deleteflag')
+          .delete('/user/' + user.userid + '/deleteflag')
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(403, done);
       });
 
-      it('should respond with a 200 when the flag is set', function(done) {
+      it('should respond with a 403 if the users password is wrong', function(done) {
         supertest
-          .post('/user/' + user.userid + '/deleteflag')
+          .delete('/user/' + user.userid + '/deleteflag')
+          .send({password: 'abc1234'})
+          .set('X-Tidepool-Session-Token')
+          .expect(403)
+          .end(done);
+      });
+
+      it('should respond with a 202 when the flag is set', function(done) {
+        supertest
+          .delete('/user/' + user.userid + '/deleteflag')
           .send({password: user.password})
           .set('X-Tidepool-Session-Token', serverToken)
-          .expect(200)
+          .expect(202)
           .end(done);
       });
 
       it('should respond with a 204 when the flag is unset', function(done) {
         supertest
-          .put('/user/' + user.userid + '/deleteflag')
+          .post('/user/' + user.userid + '/deleteflag')
           .send({password: user.password})
           .set('X-Tidepool-Session-Token')
           .expect(204)
+          .end(done);
+      });
+
+      it('should respond with a 405 when the http method is GET', function(done) {
+        supertest
+          .get('/user/' + user.userid + '/deleteflag')
+          .send({password: user.password})
+          .set('X-Tidepool-Session-Token')
+          .expect(405)
+          .end(done);
+      });
+
+      it('should respond with a 405 when the http method is PUT', function(done) {
+        supertest
+          .put('/user/' + user.userid + '/deleteflag')
+          .send({password: user.password})
+          .set('X-Tidepool-Session-Token')
+          .expect(405)
           .end(done);
       });
     });
