@@ -107,5 +107,9 @@ module.exports = (function() {
   // The local host to publish to discovery
   env.publishHost = config.fromEnvironment('PUBLISH_HOST');
 
+  //The time window for a delete flag. Used as a multiplier to mark the date an account will need to be deleted on.
+  // The multiplier is in days.
+  env.deleteWindow = config.fromEnvironment('DELETE_TIME_WINDOW', 14);
+
   return env;
 })();
