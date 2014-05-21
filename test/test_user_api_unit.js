@@ -906,20 +906,20 @@ describe('userapi', function () {
     describe('User delete flag set/unset', function() {
       it('should respond with a 401 if no session token is present', function(done) {
         supertest
-          .delete('/user/'+ user.userid + '/deleteflag')
+          .del('/user/'+ user.userid + '/deleteflag')
           .expect(401, done);
       });
 
       it('should respond with a 403 if the users password is null', function(done) {
         supertest
-          .delete('/user/' + user.userid + '/deleteflag')
+          .del('/user/' + user.userid + '/deleteflag')
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(403, done);
       });
 
       it('should respond with a 403 if the users password is wrong', function(done) {
         supertest
-          .delete('/user/' + user.userid + '/deleteflag')
+          .del('/user/' + user.userid + '/deleteflag')
           .send({password: 'abc1234'})
           .set('X-Tidepool-Session-Token')
           .expect(403)
@@ -928,7 +928,7 @@ describe('userapi', function () {
 
       it('should respond with a 202 when the flag is set', function(done) {
         supertest
-          .delete('/user/' + user.userid + '/deleteflag')
+          .del('/user/' + user.userid + '/deleteflag')
           .send({password: user.password})
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(202)
