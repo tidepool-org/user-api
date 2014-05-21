@@ -985,7 +985,7 @@ describe('userapi', function () {
         supertest
           .del('/user/' + user.userid + '/deleteflag')
           .send({password: 'abc1234'})
-          .set('X-Tidepool-Session-Token')
+          .set('X-Tidepool-Session-Token', serverToken)
           .expect(403)
           .end(done);
       });
@@ -1003,7 +1003,7 @@ describe('userapi', function () {
         supertest
           .post('/user/' + user.userid + '/deleteflag')
           .send({password: user.password})
-          .set('X-Tidepool-Session-Token')
+          .set('X-Tidepool-Session-Token', serverToken)
           .expect(204)
           .end(done);
       });
@@ -1012,7 +1012,7 @@ describe('userapi', function () {
         supertest
           .get('/user/' + user.userid + '/deleteflag')
           .send({password: user.password})
-          .set('X-Tidepool-Session-Token')
+          .set('X-Tidepool-Session-Token', serverToken)
           .expect(405)
           .end(done);
       });
@@ -1021,7 +1021,7 @@ describe('userapi', function () {
         supertest
           .put('/user/' + user.userid + '/deleteflag')
           .send({password: user.password})
-          .set('X-Tidepool-Session-Token')
+          .set('X-Tidepool-Session-Token', serverToken)
           .expect(405)
           .end(done);
       });
