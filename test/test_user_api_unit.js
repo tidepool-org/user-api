@@ -907,7 +907,8 @@ describe('userapi', function () {
       it('should respond with a 401 if no session token is present', function(done) {
         supertest
           .del('/user/'+ user.userid + '/deleteflag')
-          .expect(401, done);
+          .expect(401)
+          .end(done);
       });
 
       it('should respond with a 403 if the users password is null', function(done) {
@@ -920,7 +921,7 @@ describe('userapi', function () {
       it('should respond with a 403 if the users password is wrong', function(done) {
         supertest
           .del('/user/' + user.userid + '/deleteflag')
-          .send({password: 'abc1234'})
+          .send({password: 'badpass'})
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(403)
           .end(done);
