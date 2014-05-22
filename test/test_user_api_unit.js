@@ -904,7 +904,6 @@ describe('userapi', function () {
     });
 
     describe('User delete flag set/unset', function() {
-      var workingPw = 'bluebayou';
       it('should respond with a 401 if no session token is present', function(done) {
         supertest
           .del('/user/'+ user.userid + '/deleteflag')
