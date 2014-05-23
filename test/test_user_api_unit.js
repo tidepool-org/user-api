@@ -34,7 +34,8 @@ var env = {
     error: console.log,
     warn: console.log,
     info: console.log
-  }
+  },
+  deleteWindow: 14
 };
 
 var dbmongo = require('../lib/db_mongo.js')(env);
@@ -860,50 +861,7 @@ describe('userapi', function () {
 
     });
 
-    describe('POST /logout with valid session token', function () {
-
-      it('should respond with 200 and log out', function (done) {
-        supertest
-          .post('/logout')
-          .set('X-Tidepool-Session-Token', sessionToken)
-          .expect(200)
-          .end(done);
-      });
-
-    });
-
-    describe('DELETE /user/:id for server without password', function () {
-      it('should respond with 403', function (done) {
-        supertest
-          .del('/user/' + user.userid)
-          .set('X-Tidepool-Session-Token', serverToken)
-          .expect(403)
-          .end(done);
-      });
-    });
-
-    describe('DELETE /user/:id for server with bad userid', function () {
-      it('should respond with 403', function (done) {
-        supertest
-          .del('/user/' + 'a123af')
-          .set('X-Tidepool-Session-Token', serverToken)
-          .expect(403)
-          .end(done);
-      });
-    });
-
-    describe('DELETE /user/:id for server with password', function () {
-      it('should respond with 200', function (done) {
-        supertest
-          .del('/user/' + user.userid)
-          .send({password: user.password})
-          .set('X-Tidepool-Session-Token', serverToken)
-          .expect(200)
-          .end(done);
-      });
-    });
-
-    describe('User delete flag set/unset', function() {
+    describe('Test user delete flag set/unset functionality', function() {
       it('should respond with a 401 if no session token is present', function(done) {
         supertest
           .del('/user/'+ user.userid + '/deleteflag')
@@ -960,6 +918,49 @@ describe('userapi', function () {
           .send({password: user.password})
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(405)
+          .end(done);
+      });
+    });
+
+    describe('POST /logout with valid session token', function () {
+
+      it('should respond with 200 and log out', function (done) {
+        supertest
+          .post('/logout')
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(200)
+          .end(done);
+      });
+
+    });
+
+    describe('DELETE /user/:id for server without password', function () {
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user/' + user.userid)
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user/:id for server with bad userid', function () {
+      it('should respond with 403', function (done) {
+        supertest
+          .del('/user/' + 'a123af')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(403)
+          .end(done);
+      });
+    });
+
+    describe('DELETE /user/:id for server with password', function () {
+      it('should respond with 200', function (done) {
+        supertest
+          .del('/user/' + user.userid)
+          .send({password: user.password})
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(200)
           .end(done);
       });
     });
