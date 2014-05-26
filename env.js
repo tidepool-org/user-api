@@ -111,5 +111,9 @@ module.exports = (function() {
   // The multiplier is in days.
   env.deleteWindow = config.fromEnvironment('DELETE_TIME_WINDOW', 14);
 
+  //The time window for a delete flag. Used as a multiplier to mark the date an account will need to be deleted on.
+  // The multiplier is in days.
+  env.deleteWindow = config.fromEnvironment('DELETE_TIME_WINDOW', 14);
+
   return env;
 })();

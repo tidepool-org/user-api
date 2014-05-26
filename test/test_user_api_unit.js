@@ -36,18 +36,11 @@ var env = {
   serverSecret: 'sharedMachineSecret',
   longtermkey: 'thelongtermkey',
   logger: {
-<<<<<<< HEAD
     error: savelog,
     warn: savelog,
     info: savelog
   }
-=======
-    error: console.log,
-    warn: console.log,
-    info: console.log
-  },
   deleteWindow: 14
->>>>>>> reordered test cases to set delete flag before the user is actually deleted from mongo. reordered (and kind of refactored?) the setDeleteFlag function to be cleaner - could probably use some additional refactoring though.
 };
 
 var dbmongo = require('../lib/db_mongo.js')(env);
