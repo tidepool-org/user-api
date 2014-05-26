@@ -39,7 +39,7 @@ var env = {
     error: savelog,
     warn: savelog,
     info: savelog
-  }
+  },
   deleteWindow: 14
 };
 
