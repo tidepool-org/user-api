@@ -967,7 +967,15 @@ describe('userapi', function () {
       });
     });
 
-
+    describe('GET /token with badly-formatted token', function () {
+      it('should respond with 404', function (done) {
+        supertest
+          .get('/token/123')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(404)
+          .end(done);
+      });
+    });
 
     describe('POST /logout with valid server token', function () {
 
