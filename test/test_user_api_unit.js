@@ -39,8 +39,7 @@ var env = {
     error: savelog,
     warn: savelog,
     info: savelog
-  },
-  deleteWindow: 14
+  }
 };
 
 var dbmongo = require('../lib/db_mongo.js')(env);
@@ -1025,6 +1024,16 @@ describe('userapi', function () {
           .send({password: user.password})
           .set('X-Tidepool-Session-Token', serverToken)
           .expect(200)
+          .end(done);
+      });
+    });
+
+    describe('GET /token with badly-formatted token', function () {
+      it('should respond with 404', function (done) {
+        supertest
+          .get('/token/123')
+          .set('X-Tidepool-Session-Token', serverToken)
+          .expect(404)
           .end(done);
       });
     });
