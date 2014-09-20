@@ -335,11 +335,11 @@ describe('userapi', function () {
 
     describe('GET /login with old token', function () {
 
-      it('should return 401', function (done) {
+      it('should return 200', function (done) {
         supertest
           .get('/login')
           .set('X-Tidepool-Session-Token', oldToken)
-          .expect(401)
+          .expect(200)
           .end(done);
       });
     });
