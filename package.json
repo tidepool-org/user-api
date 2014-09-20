@@ -1,6 +1,6 @@
 {
   "name": "user-api",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "User API for handling logins and sessions",
   "main": "lib/index.js",
   "directories": {
